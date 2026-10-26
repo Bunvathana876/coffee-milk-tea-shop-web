@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@media print {
+  @page {
+    margin: 1cm;
+    size: auto;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
