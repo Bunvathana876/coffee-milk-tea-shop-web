@@ -24,7 +24,7 @@ export const CartPage: React.FC = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between border-b border-stone-200 pb-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-serif font-black text-stone-900 tracking-tight">
             Your Cart
           </h1>
           <p className="text-xs sm:text-sm text-stone-500">

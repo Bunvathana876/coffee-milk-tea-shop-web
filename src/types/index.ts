@@ -107,6 +107,9 @@ export interface CreateOrderItemPayload {
 export interface CreateOrderPayload {
   customer_name: string;
   customer_phone: string;
+  customer_email?: string | null;
+  notes?: string | null;
+  payment_method?: string;
   items: CreateOrderItemPayload[];
 }
 
@@ -115,11 +118,14 @@ export interface Order {
   order_number: string;
   customer_name: string;
   customer_phone: string;
+  customer_email?: string | null;
+  notes?: string | null;
+  payment_method?: string;
   subtotal_usd: number;
   total_usd: number;
   total_khr: number;
-  payment_status: 'pending' | 'paid' | 'failed';
-  order_status: 'pending' | 'preparing' | 'completed' | 'cancelled';
+  payment_status: 'pending' | 'paid' | 'failed' | string;
+  order_status: 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled' | string;
   created_at: string;
   items?: OrderItem[];
 }

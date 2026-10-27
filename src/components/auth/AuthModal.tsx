@@ -1,31 +1,51 @@
-import React, { useState } from 'react';
-import { X, Lock, Phone, User, Mail, Eye, EyeOff, Loader2, Sparkles, Coffee } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { X, Lock, Phone, User, Mail, Eye, EyeOff, Loader2, Coffee, Gift } from 'lucide-react';
 import { useAuth } from '../../features/auth/AuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialMode?: 'login' | 'register';
+  /** Where to go after a successful sign in / sign up */
+  redirectTo?: string;
 }
+
+const inputClass =
+  'w-full pl-11 pr-4 py-3 rounded-2xl border border-stone-200 bg-white focus:outline-none focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 text-sm transition-all';
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   initialMode = 'login',
+  redirectTo,
 }) => {
+  const navigate = useNavigate();
   const { login, register, isLoading } = useAuth();
   const [isRegister, setIsRegister] = useState(initialMode === 'register');
   const [showPassword, setShowPassword] = useState(false);
 
-  // Form Fields
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
+
+  const switchMode = (register: boolean) => {
+    setIsRegister(register);
+    setErrorMessage(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,11 +53,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       if (isRegister) {
-        if (!fullName.trim() || fullName.trim().length < 2) {
-          setErrorMessage('Please enter your full name (at least 2 letters).');
+        if (fullName.trim().length < 2) {
+          setErrorMessage('Please enter your name.');
           return;
         }
-        if (!phone.trim() || phone.trim().replace(/\D/g, '').length < 8) {
+        if (phone.trim().replace(/\D/g, '').length < 8) {
           setErrorMessage('Please enter a valid phone number (at least 8 digits).');
           return;
         }
@@ -47,231 +67,165 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         }
         await register(fullName.trim(), phone.trim(), password, email.trim() || undefined);
       } else {
-        if (!phone.trim()) {
-          setErrorMessage('Please enter your phone number or email.');
-          return;
-        }
-        if (!password) {
-          setErrorMessage('Please enter your password.');
+        if (!phone.trim() || !password) {
+          setErrorMessage('Enter your phone or email and your password.');
           return;
         }
         await login(phone.trim(), password);
       }
       onClose();
+      if (redirectTo) navigate(redirectTo);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setErrorMessage(err.message);
-      } else {
-        setErrorMessage('Authentication failed. Please verify credentials.');
-      }
+      setErrorMessage(
+        err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      );
     }
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-stone-950/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden animate-in zoom-in-95 duration-200"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="auth-title"
+        className="w-full sm:max-w-md max-h-[95vh] overflow-y-auto bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="relative p-6 bg-gradient-to-br from-amber-950 via-amber-900 to-stone-950 text-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center font-bold">
-              <Coffee className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-black text-lg text-white tracking-tight flex items-center gap-1.5">
-                {isRegister ? 'Join Café Rewards' : 'Welcome Back'}
-                <Sparkles className="w-4 h-4 text-amber-300 fill-amber-300" />
-              </h3>
-              <p className="text-xs text-amber-200/80">
-                {isRegister ? 'Earn stamps on every handcrafted beverage' : 'Sign in to access your punch card & orders'}
-              </p>
-            </div>
-          </div>
+        <div className="relative px-6 pt-7 pb-5">
           <button
+            type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-stone-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            className="absolute top-4 right-4 w-9 h-9 rounded-full text-stone-500 hover:bg-stone-100 flex items-center justify-center cursor-pointer"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
+          <span className="w-11 h-11 rounded-full bg-stone-950 text-amber-300 flex items-center justify-center mb-4">
+            <Coffee className="w-5 h-5" />
+          </span>
+          <h2 id="auth-title" className="text-2xl font-serif font-black text-stone-900 tracking-tight">
+            {isRegister ? 'Create your account' : 'Welcome back'}
+          </h2>
+          <p className="text-sm text-stone-500 mt-1">
+            {isRegister
+              ? 'Takes 10 seconds. Your cart is saved.'
+              : 'Sign in to order. Your cart is saved.'}
+          </p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="p-4 bg-stone-100/70 border-b border-stone-200/60">
-          <div className="grid grid-cols-2 gap-1 bg-stone-200/80 p-1 rounded-2xl">
-            <button
-              type="button"
-              onClick={() => {
-                setIsRegister(false);
-                setErrorMessage(null);
-              }}
-              className={`py-2 text-xs font-black rounded-xl transition-all cursor-pointer ${
-                !isRegister
-                  ? 'bg-white text-amber-950 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setIsRegister(true);
-                setErrorMessage(null);
-              }}
-              className={`py-2 text-xs font-black rounded-xl transition-all cursor-pointer ${
-                isRegister
-                  ? 'bg-white text-amber-950 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              Create Account
-            </button>
-          </div>
-        </div>
-
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-3.5" noValidate>
           {errorMessage && (
-            <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold leading-relaxed">
+            <div role="alert" className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
               {errorMessage}
             </div>
           )}
 
           {isRegister && (
-            <div>
-              <label className="block text-xs font-black text-stone-700 uppercase tracking-wider mb-1.5">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Sokha Chan"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-800 text-sm font-semibold"
-                />
-              </div>
+            <div className="relative">
+              <User className="w-4 h-4 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                autoFocus
+                autoComplete="name"
+                placeholder="Full name"
+                aria-label="Full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className={inputClass}
+              />
             </div>
           )}
 
-          <div>
-            <label className="block text-xs font-black text-stone-700 uppercase tracking-wider mb-1.5">
-              {isRegister ? 'Phone Number' : 'Phone Number or Email'}
-            </label>
-            <div className="relative">
-              <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                required
-                placeholder={isRegister ? 'e.g. 012 345 678' : '012 345 678 or you@domain.com'}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-800 text-sm font-semibold"
-              />
-            </div>
+          <div className="relative">
+            <Phone className="w-4 h-4 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              autoFocus={!isRegister}
+              autoComplete="username"
+              inputMode={isRegister ? 'tel' : 'text'}
+              placeholder={isRegister ? 'Phone number' : 'Phone number or email'}
+              aria-label={isRegister ? 'Phone number' : 'Phone number or email'}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className={inputClass}
+            />
           </div>
 
           {isRegister && (
-            <div>
-              <label className="block text-xs font-black text-stone-700 uppercase tracking-wider mb-1.5">
-                Email Address <span className="text-stone-400 font-normal">(Optional)</span>
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  placeholder="e.g. sokha@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-800 text-sm font-semibold"
-                />
-              </div>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2" />
+              <input
+                type="email"
+                autoComplete="email"
+                placeholder="Email (optional)"
+                aria-label="Email (optional)"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={inputClass}
+              />
             </div>
           )}
 
-          <div>
-            <label className="block text-xs font-black text-stone-700 uppercase tracking-wider mb-1.5">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                placeholder="At least 6 characters"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 rounded-2xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-800 text-sm font-semibold"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
+          <div className="relative">
+            <Lock className="w-4 h-4 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              autoComplete={isRegister ? 'new-password' : 'current-password'}
+              placeholder="Password"
+              aria-label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`${inputClass} pr-11`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full mt-2 py-3.5 rounded-2xl bg-amber-900 hover:bg-amber-950 text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 disabled:opacity-50"
+            className="w-full py-3.5 rounded-full bg-stone-950 hover:bg-stone-800 text-white font-black text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] disabled:opacity-50"
           >
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Processing...</span>
+                <span>Please wait…</span>
               </>
             ) : isRegister ? (
-              'Create My Account'
+              'Create account'
             ) : (
-              'Sign In to Café'
+              'Sign in'
             )}
           </button>
 
-          {/* Quick Switcher for Users Without/With Account */}
-          <div className="pt-2 text-center text-xs text-stone-500">
-            {!isRegister ? (
-              <p>
-                Don't have an account yet?{' '}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsRegister(true);
-                    setErrorMessage(null);
-                  }}
-                  className="font-bold text-amber-900 hover:underline cursor-pointer"
-                >
-                  Register here (10s)
-                </button>
-              </p>
-            ) : (
-              <p>
-                Already have an account?{' '}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsRegister(false);
-                    setErrorMessage(null);
-                  }}
-                  className="font-bold text-amber-900 hover:underline cursor-pointer"
-                >
-                  Sign in here
-                </button>
-              </p>
-            )}
-          </div>
+          {isRegister && (
+            <p className="flex items-center justify-center gap-1.5 text-xs text-stone-500">
+              <Gift className="w-3.5 h-3.5 text-amber-600" />
+              Every 10th drink is free
+            </p>
+          )}
+
+          <p className="pt-1 text-center text-sm text-stone-500">
+            {isRegister ? 'Already have an account?' : 'New here?'}{' '}
+            <button
+              type="button"
+              onClick={() => switchMode(!isRegister)}
+              className="font-bold text-stone-950 underline underline-offset-4 cursor-pointer"
+            >
+              {isRegister ? 'Sign in' : 'Create an account'}
+            </button>
+          </p>
         </form>
       </div>
     </div>
   );
 };
-

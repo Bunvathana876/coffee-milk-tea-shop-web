@@ -9,13 +9,21 @@ import {
 const TOKEN_KEY = 'coffee_customer_token';
 const USER_KEY = 'coffee_customer_user';
 
+export interface AuthModalOptions {
+  mode?: 'login' | 'register';
+  redirectTo?: string;
+}
+
 interface AuthContextType {
   user: CustomerUser | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   authModalOpen: boolean;
+  authModalOptions: AuthModalOptions;
   openAuthModal: () => void;
+  /** Open the modal in a specific mode and optionally navigate somewhere after success. */
+  openAuthModalWith: (options: AuthModalOptions) => void;
   closeAuthModal: () => void;
   login: (identifier: string, password: string) => Promise<void>;
   register: (fullName: string, phone: string, password: string, email?: string) => Promise<void>;
@@ -41,7 +49,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
-  const openAuthModal = () => setAuthModalOpen(true);
+  const [authModalOptions, setAuthModalOptions] = useState<AuthModalOptions>({});
+
+  const openAuthModal = () => {
+    setAuthModalOptions({});
+    setAuthModalOpen(true);
+  };
+  const openAuthModalWith = (options: AuthModalOptions) => {
+    setAuthModalOptions(options);
+    setAuthModalOpen(true);
+  };
   const closeAuthModal = () => setAuthModalOpen(false);
 
   const refreshProfile = useCallback(async () => {
@@ -111,7 +128,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: Boolean(token && user),
         isLoading,
         authModalOpen,
+        authModalOptions,
         openAuthModal,
+        openAuthModalWith,
         closeAuthModal,
         login,
         register,

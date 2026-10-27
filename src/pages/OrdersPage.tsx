@@ -9,6 +9,9 @@ import {
   Coffee,
   FileText,
   Sparkles,
+  Copy,
+  Check,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../features/auth/AuthContext';
 import { useCart } from '../features/cart/useCart';
@@ -26,14 +29,7 @@ export const OrdersPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [reorderSuccess, setReorderSuccess] = useState<string | null>(null);
-
-  // Auto-search if user is logged in
-  useEffect(() => {
-    if (user?.phone) {
-      setPhoneInput(user.phone);
-      handleSearch(user.phone);
-    }
-  }, [user]);
+  const [copiedOrderNumber, setCopiedOrderNumber] = useState<string | null>(null);
 
   const handleSearch = async (phoneToSearch?: string) => {
     const targetPhone = (phoneToSearch || phoneInput).trim();
@@ -52,12 +48,29 @@ export const OrdersPage: React.FC = () => {
     }
   };
 
+  // Auto-search if user is logged in
+  const userPhone = user?.phone;
+  useEffect(() => {
+    if (userPhone) {
+      setPhoneInput(userPhone);
+      void handleSearch(userPhone);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userPhone]);
+
+  const handleCopyOrderNumber = (orderNumber: string) => {
+    navigator.clipboard.writeText(orderNumber);
+    setCopiedOrderNumber(orderNumber);
+    setTimeout(() => {
+      setCopiedOrderNumber(null);
+    }, 2500);
+  };
+
   const handleReorder = (order: Order) => {
     if (!order.items || order.items.length === 0) return;
 
     let totalAdded = 0;
     for (const item of order.items) {
-      // Parse toppings string into array
       const toppingsArray = item.toppings
         ? item.toppings.split(',').map((t) => t.trim()).filter(Boolean)
         : [];
@@ -75,10 +88,18 @@ export const OrdersPage: React.FC = () => {
       totalAdded += item.quantity;
     }
 
-    setReorderSuccess(`Added ${totalAdded} drink(s) from order ${order.order_number} to your cart!`);
+    setReorderSuccess(`Added ${totalAdded} drink(s) from order ${order.order_number} to your bag!`);
     setTimeout(() => {
       setReorderSuccess(null);
     }, 4000);
+  };
+
+  const getStepProgress = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === 'completed') return 4;
+    if (s === 'ready') return 3;
+    if (s === 'preparing') return 2;
+    return 1; // pending/received
   };
 
   const getStatusBadge = (status: string) => {
@@ -86,19 +107,19 @@ export const OrdersPage: React.FC = () => {
       case 'completed':
         return (
           <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
-            Completed
+            Enjoyed & Completed
           </span>
         );
       case 'preparing':
         return (
           <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
-            In the Kitchen
+            Barista Brewing
           </span>
         );
       case 'ready':
         return (
           <span className="px-3 py-1 rounded-full text-xs font-black bg-sky-100 text-sky-800 border border-sky-300">
-            Ready for Pickup
+            Ready for Pickup!
           </span>
         );
       case 'cancelled':
@@ -110,7 +131,7 @@ export const OrdersPage: React.FC = () => {
       default:
         return (
           <span className="px-3 py-1 rounded-full text-xs font-black bg-stone-100 text-stone-700 border border-stone-300">
-            Received
+            Order Received
           </span>
         );
     }
@@ -120,39 +141,39 @@ export const OrdersPage: React.FC = () => {
     <div className="max-w-4xl mx-auto py-4 sm:py-8 space-y-6 sm:space-y-8">
       {/* Toast */}
       {reorderSuccess && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-md bg-stone-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-stone-800 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed bottom-6 right-6 z-50 max-w-md bg-stone-950 text-white px-4 py-3 rounded-2xl shadow-2xl border border-stone-800 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200 ring-1 ring-white/10">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <span className="text-xs sm:text-sm font-medium">{reorderSuccess}</span>
           <button
             onClick={() => navigate('/cart')}
             className="text-amber-300 hover:underline font-bold text-xs ml-2 cursor-pointer"
           >
-            View Cart
+            View Bag
           </button>
         </div>
       )}
 
       {/* Header */}
-      <div className="border-b border-stone-200 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="border-b border-stone-200/80 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-            Order Tracking & History
+          <h1 className="text-2xl sm:text-4xl font-serif font-black text-stone-900 tracking-tight">
+            Live Order Tracking
           </h1>
           <p className="text-xs sm:text-sm text-stone-500 mt-1">
-            Track your live drink status or reorder previous favorites in 1 tap.
+            Real-time preparation updates, receipts, and 1-tap reordering
           </p>
         </div>
 
         {isAuthenticated && user && (
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-100/80 border border-amber-300 text-amber-950 text-xs font-bold">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-100/80 border border-amber-300/80 text-amber-950 text-xs font-bold">
             <Sparkles className="w-4 h-4 text-amber-700" />
-            <span>{user.full_name} • {user.loyalty_stamps} Stamps</span>
+            <span>{user.full_name} • {user.loyalty_stamps} Stamps ⭐️</span>
           </div>
         )}
       </div>
 
       {/* Phone Lookup Box */}
-      <div className="bg-white p-5 rounded-3xl border border-stone-200/90 shadow-xs space-y-3">
+      <div className="bg-white p-5 sm:p-6 rounded-3xl border border-stone-200/90 shadow-xs space-y-3">
         <label className="block text-xs font-black text-stone-700 uppercase tracking-wider">
           Lookup by Customer Phone Number
         </label>
@@ -166,11 +187,13 @@ export const OrdersPage: React.FC = () => {
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
-              type="text"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               placeholder="e.g. 012 345 678"
               value={phoneInput}
               onChange={(e) => setPhoneInput(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-2xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-800 text-sm font-semibold"
+              className="w-full pl-10 pr-4 py-3 rounded-2xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-900 text-sm font-semibold bg-stone-50/50"
             />
           </div>
           <button
@@ -184,114 +207,212 @@ export const OrdersPage: React.FC = () => {
       </div>
 
       {/* Orders List */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         {isLoading ? (
-          <div className="text-center py-12 text-stone-400 font-bold text-sm">
-            Loading your orders...
+          <div className="text-center py-12 text-stone-400 font-bold text-sm space-y-2">
+            <div className="w-8 h-8 rounded-full border-2 border-amber-900 border-t-transparent animate-spin mx-auto" />
+            <p>Fetching your orders from the kitchen...</p>
           </div>
         ) : orders.length > 0 ? (
-          orders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-xs hover:shadow-md transition-all space-y-4"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center font-bold">
-                    <Coffee className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="font-mono text-xs font-black text-stone-900 block">
-                      {order.order_number}
-                    </span>
-                    <span className="text-[11px] text-stone-400 flex items-center gap-1 font-medium mt-0.5">
-                      <Clock className="w-3 h-3" />
-                      {new Date(order.created_at).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
+          orders.map((order) => {
+            const step = getStepProgress(order.order_status);
+            const isCancelled = order.order_status.toLowerCase() === 'cancelled';
 
-                <div className="flex items-center gap-2">
-                  {getStatusBadge(order.order_status)}
-                </div>
-              </div>
-
-              {/* Items List */}
-              <div className="space-y-2.5">
-                {order.items?.map((item, idx) => (
-                  <div key={idx} className="flex items-start justify-between text-xs gap-4">
+            return (
+              <div
+                key={order.id}
+                className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-7 shadow-xs hover:shadow-md transition-all space-y-5"
+              >
+                {/* Order Top Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center font-bold">
+                      <Coffee className="w-6 h-6 text-amber-800" />
+                    </div>
                     <div>
-                      <span className="font-extrabold text-stone-900">
-                        {item.quantity}x {item.product_name}
-                      </span>
-                      <span className="text-stone-500 block text-[11px] mt-0.5">
-                        {item.size} • {item.sugar_level} sugar • {item.ice_level}
-                        {item.toppings ? ` • +${item.toppings}` : ''}
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs sm:text-sm font-black text-stone-900">
+                          {order.order_number}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyOrderNumber(order.order_number)}
+                          className="text-stone-400 hover:text-stone-700 p-1 rounded-md transition-colors"
+                          title="Copy order reference"
+                        >
+                          {copiedOrderNumber === order.order_number ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+                      <span className="text-[11px] text-stone-400 flex items-center gap-1 font-medium mt-0.5">
+                        <Clock className="w-3 h-3" />
+                        {new Date(order.created_at).toLocaleString()}
                       </span>
                     </div>
-                    <span className="font-black text-stone-800">
-                      {formatUsd(item.subtotal_usd)}
-                    </span>
                   </div>
-                ))}
-              </div>
 
-              {/* Footer Total & 1-Tap Reorder */}
-              <div className="pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
-                    Total Amount
-                  </span>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-black text-base text-amber-950">
-                      {formatUsd(order.total_usd)}
-                    </span>
-                    <span className="text-xs font-bold text-stone-400">
-                      ({formatKhr(order.total_usd)})
-                    </span>
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(order.order_status)}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Link
-                    to={`/receipt/${order.id}`}
-                    state={{ order }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-200 hover:bg-stone-50 text-stone-700 font-bold text-xs transition-colors"
-                  >
-                    <FileText className="w-3.5 h-3.5 text-stone-500" />
-                    <span>Receipt</span>
-                  </Link>
+                {/* Live Preparation Timeline Stepper */}
+                {!isCancelled && (
+                  <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/70">
+                    <div className="grid grid-cols-4 gap-2 text-center relative">
+                      {/* Step 1 */}
+                      <div className="space-y-1">
+                        <div
+                          className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center text-xs font-black ${
+                            step >= 1
+                              ? 'bg-amber-900 text-white ring-2 ring-amber-900/20'
+                              : 'bg-stone-200 text-stone-500'
+                          }`}
+                        >
+                          {step > 1 ? '✓' : '1'}
+                        </div>
+                        <span className="text-[10px] font-bold text-stone-700 block">Received</span>
+                      </div>
 
-                  <button
-                    onClick={() => handleReorder(order)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-950 text-white font-black text-xs shadow-xs transition-all cursor-pointer active:scale-95"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>1-Tap Reorder</span>
-                  </button>
+                      {/* Step 2 */}
+                      <div className="space-y-1">
+                        <div
+                          className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center text-xs font-black ${
+                            step >= 2
+                              ? 'bg-amber-900 text-white ring-2 ring-amber-900/20'
+                              : 'bg-stone-200 text-stone-500'
+                          }`}
+                        >
+                          {step > 2 ? '✓' : '2'}
+                        </div>
+                        <span className="text-[10px] font-bold text-stone-700 block">Brewing</span>
+                      </div>
+
+                      {/* Step 3 */}
+                      <div className="space-y-1">
+                        <div
+                          className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center text-xs font-black ${
+                            step >= 3
+                              ? 'bg-emerald-600 text-white ring-2 ring-emerald-600/20'
+                              : 'bg-stone-200 text-stone-500'
+                          }`}
+                        >
+                          {step > 3 ? '✓' : '3'}
+                        </div>
+                        <span className="text-[10px] font-bold text-stone-700 block">Ready</span>
+                      </div>
+
+                      {/* Step 4 */}
+                      <div className="space-y-1">
+                        <div
+                          className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center text-xs font-black ${
+                            step >= 4
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-stone-200 text-stone-500'
+                          }`}
+                        >
+                          {step >= 4 ? '✓' : '4'}
+                        </div>
+                        <span className="text-[10px] font-bold text-stone-700 block">Enjoyed</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Items List */}
+                <div className="divide-y divide-stone-100">
+                  {order.items?.map((item, idx) => (
+                    <div key={idx} className="py-2.5 first:pt-0 last:pb-0 flex items-start justify-between text-xs gap-4">
+                      <div>
+                        <span className="font-serif font-bold text-stone-900">
+                          {item.quantity}x {item.product_name}
+                        </span>
+                        <span className="text-stone-500 block text-[11px] mt-0.5">
+                          {item.size} • {item.sugar_level} sugar • {item.ice_level}
+                          {item.toppings ? ` • +${item.toppings}` : ''}
+                        </span>
+                      </div>
+                      <span className="font-black text-stone-900">
+                        {formatUsd(item.subtotal_usd)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Customer Notes (if provided) */}
+                {order.notes && (
+                  <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/60 text-xs text-amber-950">
+                    <span className="font-black block text-[10px] uppercase text-amber-800">
+                      Barista Notes:
+                    </span>
+                    <span>{order.notes}</span>
+                  </div>
+                )}
+
+                {/* Footer Total & 1-Tap Reorder */}
+                <div className="pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
+                      Total Paid / Due
+                    </span>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="font-serif font-black text-lg text-amber-950">
+                        {formatUsd(order.total_usd)}
+                      </span>
+                      <span className="text-xs font-bold text-stone-400">
+                        ({formatKhr(order.total_usd)})
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Link
+                      to={`/receipt/${order.id}`}
+                      state={{ order }}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl border border-stone-200 hover:bg-stone-50 text-stone-700 font-black text-xs transition-colors"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-stone-500" />
+                      <span>View Receipt</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => handleReorder(order)}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-amber-900 hover:bg-amber-950 text-white font-black text-xs shadow-md transition-all cursor-pointer active:scale-95"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>1-Tap Reorder</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : hasSearched ? (
           <div className="bg-white rounded-3xl border border-stone-200 p-8 text-center space-y-3">
             <AlertCircle className="w-10 h-10 text-stone-300 mx-auto" />
-            <h3 className="font-bold text-stone-800 text-sm">No orders found for this phone number</h3>
-            <p className="text-xs text-stone-500">
-              Please check your phone number or place a new order from our menu.
+            <h3 className="font-serif font-bold text-stone-800 text-base">No orders found for this phone number</h3>
+            <p className="text-xs text-stone-500 max-w-sm mx-auto">
+              Please double check the phone number or place your first artisan order from our drink menu.
             </p>
-            <Link
-              to="/menu"
-              className="inline-block mt-2 px-5 py-2.5 rounded-2xl bg-amber-900 text-white font-bold text-xs"
-            >
-              Browse Drink Menu
-            </Link>
+            <div className="pt-2">
+              <Link
+                to="/menu"
+                className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-2xl bg-amber-900 text-white font-black text-xs shadow-md"
+              >
+                <span>Browse Drink Menu</span>
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="bg-stone-100/60 rounded-3xl border border-dashed border-stone-300 p-10 text-center space-y-2">
             <Coffee className="w-10 h-10 text-stone-400 mx-auto" />
             <p className="text-xs font-bold text-stone-600">
-              Enter your phone number above to view past orders and live preparation updates.
+              Enter your phone number above to track your order in real time or view your drink history.
             </p>
           </div>
         )}

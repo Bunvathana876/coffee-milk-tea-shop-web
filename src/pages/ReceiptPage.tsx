@@ -19,6 +19,7 @@ import { getOrderById } from '../services/orderService';
 import { AbaKhqrPayment } from '../components/payment';
 import { downloadReceiptPdf } from '../utils/receiptPdfGenerator';
 import type { Order } from '../types';
+import confetti from 'canvas-confetti';
 
 export const ReceiptPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
@@ -35,6 +36,21 @@ export const ReceiptPage: React.FC = () => {
   // Local simulated payment status for portfolio testing (starts strictly as 'pending')
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid'>('pending');
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+
+  useEffect(() => {
+    if (stateOrder) {
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.5 },
+          colors: ['#f59e0b', '#d97706', '#92400e', '#78350f', '#fde68a'],
+        });
+      } catch {
+        // confetti is purely decorative
+      }
+    }
+  }, [stateOrder]);
 
   useEffect(() => {
     let isMounted = true;
@@ -412,8 +428,8 @@ export const ReceiptPage: React.FC = () => {
                   Payment Method:
                 </span>
                 <span className="font-extrabold text-stone-900 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#004f71]" />
-                  ABA KHQR
+                  <span className={`w-2 h-2 rounded-full ${order.payment_method === 'cash' ? 'bg-emerald-600' : 'bg-[#004f71]'}`} />
+                  {order.payment_method === 'cash' ? 'Cash on Pickup / Delivery' : 'ABA KHQR'}
                 </span>
               </div>
 
@@ -434,6 +450,18 @@ export const ReceiptPage: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {/* --- SPECIAL INSTRUCTIONS / NOTES --- */}
+            {order.notes && (
+              <div className="py-3 border-b-2 border-dashed border-stone-200 text-xs">
+                <span className="text-stone-500 uppercase tracking-wider text-[11px] font-bold block mb-1">
+                  Special Instructions:
+                </span>
+                <span className="font-semibold text-stone-900 bg-amber-50/80 p-2.5 rounded-xl block border border-amber-200/60 leading-relaxed">
+                  {order.notes}
+                </span>
+              </div>
+            )}
 
             {/* --- PRINT / EMBEDDED MOCK KHQR SECTION --- */}
             {/* Displayed directly inside the receipt ticket for easy printing & compact review */}
@@ -464,14 +492,14 @@ export const ReceiptPage: React.FC = () => {
 
             {/* --- CAFÉ RECEIPT FOOTER --- */}
             <div className="pt-5 text-center space-y-1 text-xs text-stone-400">
-              <p className="font-bold text-stone-600">
-                Thank you for visiting Coffee & Milk Tea Café!
+              <p className="font-bold text-stone-700">
+                Thank you for ordering with Brew & Boba!
               </p>
               <p className="text-[11px]">
-                Please present this receipt when picking up your freshly prepared drinks.
+                Please present this receipt ticket or your order number when picking up your drinks.
               </p>
               <p className="text-[10px] text-stone-400 pt-1 font-mono">
-                {order.order_number} • POS-TERMINAL-01
+                {order.order_number} • BREW-BOBA-BKK1
               </p>
             </div>
           </div>

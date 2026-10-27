@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, QrCode, Trash2, ShoppingBag, Lock, Sparkles } from 'lucide-react';
+import { ArrowRight, QrCode, Trash2, ShoppingBag } from 'lucide-react';
 import { formatUsd, formatKhr } from '../../config/currency';
 import { Button } from '../common/Button';
 import { useAuth } from '../../features/auth/AuthContext';
@@ -20,7 +20,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
   onClearCart,
 }) => {
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
-  const { isAuthenticated, openAuthModal } = useAuth();
+  const { isAuthenticated, openAuthModalWith } = useAuth();
 
   return (
     <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-xs space-y-5 sticky top-24">
@@ -103,15 +103,21 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
             <Button
               variant="primary"
               size="lg"
-              onClick={openAuthModal}
+              onClick={() => openAuthModalWith({ mode: 'register', redirectTo: '/checkout' })}
               className="w-full justify-between shadow-md"
-              icon={<Lock className="w-4 h-4" />}
+              icon={<ArrowRight className="w-4 h-4" />}
             >
-              <span>Sign In to Checkout</span>
+              <span>Continue to checkout</span>
             </Button>
-            <p className="text-[11px] text-amber-800 font-semibold text-center flex items-center justify-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-600 shrink-0" />
-              Sign in or create account to buy drinks & earn stamps
+            <p className="text-xs text-stone-500 text-center">
+              Have an account?{' '}
+              <button
+                type="button"
+                onClick={() => openAuthModalWith({ mode: 'login', redirectTo: '/checkout' })}
+                className="font-bold text-stone-950 underline underline-offset-4 cursor-pointer"
+              >
+                Sign in
+              </button>
             </p>
           </div>
         )}
