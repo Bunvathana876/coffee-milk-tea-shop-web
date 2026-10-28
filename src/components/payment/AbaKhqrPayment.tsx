@@ -17,7 +17,7 @@ export interface AbaKhqrPaymentProps {
   amountUsd: number;
   /** Secondary order amount in KHR (defaults to automatic conversion) */
   amountKhr?: number;
-  /** Merchant name displayed on KHQR standee (default: "Coffee & Milk Tea Café") */
+  /** Merchant name displayed on KHQR standee (default: "Brew & Boba Café") */
   merchantName?: string;
   /** Customer's name if available */
   customerName?: string;
@@ -35,7 +35,7 @@ export const AbaKhqrPayment: React.FC<AbaKhqrPaymentProps> = ({
   orderNumber = 'DEMO-ORDER',
   amountUsd,
   amountKhr,
-  merchantName = 'Coffee & Milk Tea Café',
+  merchantName = 'Brew & Boba Café',
   customerName,
   paymentStatus = 'pending',
   onSimulatePaid,

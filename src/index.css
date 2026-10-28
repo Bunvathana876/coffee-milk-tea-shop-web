@@ -3,12 +3,42 @@
 @theme {
   --font-serif: "Fraunces", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+
+  /* Brand Palette — Warm Coffee & Tea House */
+  --color-cream: #fbf8f5;
+  --color-cream-deep: #f3ece4;
+  --color-espresso: #4a2c1d;
+  --color-espresso-dark: #2a160d;
+  --color-ink: #231812;
+  --color-ink-soft: #5e4f44;
+  --color-caramel: #c87a32;
+  --color-caramel-soft: #f4c48e;
+  --color-sage: #536f57;
+  --color-sage-soft: #edf3ee;
+  --color-orange-accent: #dd5e28;
+  --color-orange-accent-soft: #fdeee7;
+  --color-matcha: #527a55;
+  --color-line: #e8ddd2;
+
+  /* shadcn UI compatibility tokens aligned with brand palette */
+  --color-card: #ffffff;
+  --color-card-foreground: #231812;
+  --color-border: #e8ddd2;
+  --color-sidebar-border: #e8ddd2;
+  --color-primary: #4a2c1d;
+  --color-primary-foreground: #fbf8f5;
+  --color-muted: #f3ece4;
+  --color-muted-foreground: #5e4f44;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #fbf9f5;
-  color: #1c1917;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -19,14 +49,35 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5f0e6;
+  background: var(--color-cream-deep);
 }
 ::-webkit-scrollbar-thumb {
-  background: #d8c7b5;
+  background: var(--color-line);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #bfa791;
+  background: #cbb9a7;
+}
+
+/* Scrollbar-none utility for clean horizontal scrollers (menu categories, etc.) */
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Respect user's motion preferences without breaking essential interactions */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Print Styles for Receipt */

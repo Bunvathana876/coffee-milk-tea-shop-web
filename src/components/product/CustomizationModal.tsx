@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useId } from 'react';
-import { X, Plus, Minus, Check } from 'lucide-react';
+import { X, Plus, Minus, Check, Coffee, Sparkles, ChevronRight } from 'lucide-react';
 import type { Product, DrinkSize, SugarLevel, IceLevel, DrinkCustomization } from '../../types';
 import {
   SIZE_OPTIONS,
@@ -82,118 +82,131 @@ const CustomizationModalContent: React.FC<ModalContentProps> = ({
 
   return (
     <div
-      className="w-full sm:max-w-xl max-h-[92vh] sm:max-h-[88vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200"
+      className="relative flex w-full sm:max-w-[540px] max-h-[92vh] sm:max-h-[88vh] flex-col overflow-hidden rounded-t-[28px] sm:rounded-[28px] border border-line bg-cream shadow-2xl animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200"
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Photo header */}
-      <div className="relative h-44 sm:h-52 shrink-0 bg-amber-950 overflow-hidden">
-        {product.image && (
-          <img src={product.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/20 to-transparent" />
+      {/* V0-Styled Header with Espresso & Ambient Ring */}
+      <div className="relative flex h-32 sm:h-36 items-end justify-between overflow-hidden bg-espresso px-6 pb-5 text-cream shrink-0">
+        {/* Ambient Decorative Rings */}
+        <div className="absolute -right-8 -top-14 size-44 rounded-full border-[18px] border-caramel/25 pointer-events-none" />
+        <div className="absolute -bottom-14 left-1/2 size-40 -translate-x-1/2 rounded-full bg-caramel/10 blur-2xl pointer-events-none" />
+
+        <div className="relative flex items-center gap-3.5 z-10 min-w-0 pr-4">
+          {product.image ? (
+            <img
+              src={product.image}
+              alt=""
+              className="w-12 h-12 rounded-2xl object-cover shrink-0 border border-white/20 shadow-md"
+            />
+          ) : (
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-caramel text-espresso-dark shrink-0 shadow-md">
+              <Coffee className="size-6" />
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="font-sans text-[11px] font-bold uppercase tracking-wider text-caramel-soft">
+              Customize your drink
+            </p>
+            <h2 id={titleId} className="font-serif text-xl sm:text-2xl font-black text-cream leading-tight truncate">
+              {product.name}
+            </h2>
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 text-stone-800 flex items-center justify-center hover:bg-white transition-colors cursor-pointer"
-          aria-label="Close customization dialog"
+          aria-label="Close customizer"
+          className="relative z-10 flex size-10 items-center justify-center rounded-full text-cream/70 transition hover:bg-cream/10 hover:text-cream cursor-pointer"
         >
-          <X className="w-5 h-5" />
+          <X className="size-5" />
         </button>
-        <div className="absolute bottom-4 left-5 right-5 text-white">
-          <h2 id={titleId} className="text-2xl font-serif font-black tracking-tight truncate">
-            {product.name}
-          </h2>
-          {product.description && (
-            <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{product.description}</p>
-          )}
-        </div>
       </div>
 
-      {/* Modal Body: Scrollable Customization Steps */}
-      <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
-        {/* Validation Warning */}
+      {/* Scrollable Customization Body */}
+      <div className="flex flex-col gap-6 overflow-y-auto px-5 sm:px-8 py-5 flex-1 scrollbar-none">
+        {/* Subtle Feature Badge */}
+        <div className="flex items-center justify-between rounded-2xl bg-cream-deep px-4 py-3 border border-line/40">
+          <div>
+            <p className="font-sans text-xs sm:text-sm font-bold text-ink">Handcrafted your way</p>
+            <p className="font-sans text-[11px] text-ink-soft">Freshly tailored upon every single order.</p>
+          </div>
+          <Sparkles className="size-4 text-caramel shrink-0" />
+        </div>
+
+        {/* Validation Warning if any */}
         {validationError && (
-          <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
-            <span>⚠️</span>
-            <span>{validationError}</span>
+          <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
+            {validationError}
           </div>
         )}
 
         {/* Step 1: Cup Size */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-black uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-full bg-amber-900 text-white text-[10px] flex items-center justify-center font-black">1</span>
-              <span>Cup Size</span>
-              <span className="text-rose-500">*</span>
-            </label>
-            <span className="text-xs font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/50">
-              {selectedSize}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2.5">
-            {SIZE_OPTIONS.map((size) => {
-              const isSelected = selectedSize === size.value;
+        <fieldset>
+          <legend className="mb-2.5 font-sans text-xs sm:text-sm font-bold text-ink uppercase tracking-wider">
+            1. Cup size
+          </legend>
+          <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+            {SIZE_OPTIONS.map((option) => {
+              const selected = selectedSize === option.value;
               return (
                 <button
-                  key={size.value}
+                  key={option.value}
                   type="button"
+                  aria-pressed={selected}
                   onClick={() => {
-                    setSelectedSize(size.value);
+                    setSelectedSize(option.value);
                     setValidationError(null);
                   }}
-                  className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between active:scale-98 ${
-                    isSelected
-                      ? 'border-amber-900 bg-amber-50/90 ring-2 ring-amber-900/30 shadow-xs'
-                      : 'border-stone-200 bg-white hover:border-amber-300 hover:bg-stone-50/60'
+                  className={`min-h-16 rounded-2xl border px-3 py-2.5 text-center transition-all cursor-pointer ${
+                    selected
+                      ? 'border-espresso bg-espresso text-cream shadow-sm'
+                      : 'border-line bg-white hover:border-caramel/70 text-ink'
                   }`}
                 >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-stone-900">{size.label}</span>
-                      {isSelected && <Check className="w-3.5 h-3.5 text-amber-900" />}
-                    </div>
-                    <span className="text-[11px] text-stone-500 block mt-0.5 font-medium">{size.description}</span>
-                  </div>
-
-                  <div className="mt-2 text-xs font-black text-amber-950">
-                    {size.priceAdjustment === 0 ? 'Base price' : `+${formatUsd(size.priceAdjustment)}`}
-                  </div>
+                  <span className="block font-sans text-sm font-bold">{option.label}</span>
+                  <span
+                    className={`block font-sans text-[11px] mt-0.5 ${
+                      selected ? 'text-cream/70' : 'text-ink-soft'
+                    }`}
+                  >
+                    {option.description} ·{' '}
+                    <strong className={selected ? 'text-caramel-soft' : 'text-ink'}>
+                      {option.priceAdjustment ? `+${formatUsd(option.priceAdjustment)}` : 'Included'}
+                    </strong>
+                  </span>
                 </button>
               );
             })}
           </div>
-        </section>
+        </fieldset>
 
-        {/* Step 2: Sugar Level */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-black uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-full bg-amber-900 text-white text-[10px] flex items-center justify-center font-black">2</span>
-              <span>Sweetness</span>
-              <span className="text-rose-500">*</span>
-            </label>
-            <span className="text-xs font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/50">
+        {/* Step 2: Sweetness */}
+        <fieldset>
+          <div className="mb-2.5 flex items-center justify-between">
+            <legend className="font-sans text-xs sm:text-sm font-bold text-ink uppercase tracking-wider">
+              2. Sweetness
+            </legend>
+            <span className="rounded-full bg-cream-deep px-3 py-1 font-sans text-xs font-bold text-espresso border border-line/60">
               {selectedSugar}
             </span>
           </div>
-
           <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
             {SUGAR_OPTIONS.map((sugar) => {
-              const isSelected = selectedSugar === sugar;
+              const selected = selectedSugar === sugar;
               return (
                 <button
                   key={sugar}
                   type="button"
+                  aria-pressed={selected}
                   onClick={() => {
                     setSelectedSugar(sugar);
                     setValidationError(null);
                   }}
-                  className={`py-3 px-1 rounded-xl text-xs font-black transition-all text-center cursor-pointer active:scale-95 ${
-                    isSelected
-                      ? 'bg-amber-900 text-white shadow-md ring-2 ring-amber-900/30'
-                      : 'bg-stone-100 text-stone-700 hover:bg-stone-200/80 border border-stone-200/60'
+                  className={`py-3 px-1 rounded-xl text-xs sm:text-sm font-bold transition-all text-center cursor-pointer ${
+                    selected
+                      ? 'bg-espresso text-cream shadow-sm'
+                      : 'bg-white border border-line text-ink-soft hover:bg-cream-deep'
                   }`}
                 >
                   {sugar}
@@ -201,36 +214,37 @@ const CustomizationModalContent: React.FC<ModalContentProps> = ({
               );
             })}
           </div>
-        </section>
-
-        {/* Step 3: Ice Level */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-black uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-full bg-amber-900 text-white text-[10px] flex items-center justify-center font-black">3</span>
-              <span>Ice</span>
-              <span className="text-rose-500">*</span>
-            </label>
-            <span className="text-xs font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/50">
-              {selectedIce}
-            </span>
+          <div className="mt-1.5 flex justify-between font-sans text-[11px] text-ink-soft px-1">
+            <span>Less sweet</span>
+            <span>Balanced</span>
+            <span>Sweet</span>
           </div>
+        </fieldset>
 
+        {/* Step 3: Ice level */}
+        <fieldset>
+          <div className="mb-2.5 flex items-center justify-between">
+            <legend className="font-sans text-xs sm:text-sm font-bold text-ink uppercase tracking-wider">
+              3. Ice level
+            </legend>
+            <span className="text-xs font-bold text-ink-soft">{selectedIce}</span>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {ICE_OPTIONS.map((ice) => {
-              const isSelected = selectedIce === ice;
+              const selected = selectedIce === ice;
               return (
                 <button
                   key={ice}
                   type="button"
+                  aria-pressed={selected}
                   onClick={() => {
                     setSelectedIce(ice);
                     setValidationError(null);
                   }}
-                  className={`py-3 px-2 rounded-xl text-xs font-black transition-all text-center cursor-pointer active:scale-95 ${
-                    isSelected
-                      ? 'bg-amber-900 text-white shadow-md ring-2 ring-amber-900/30'
-                      : 'bg-stone-100 text-stone-700 hover:bg-stone-200/80 border border-stone-200/60'
+                  className={`min-h-11 rounded-xl border px-3 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                    selected
+                      ? 'border-espresso bg-espresso text-cream shadow-xs'
+                      : 'border-line bg-white text-ink-soft hover:border-caramel hover:text-ink'
                   }`}
                 >
                   {ice}
@@ -238,117 +252,97 @@ const CustomizationModalContent: React.FC<ModalContentProps> = ({
               );
             })}
           </div>
-        </section>
+        </fieldset>
 
-        {/* Step 4: Signature Toppings */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-black uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-full bg-amber-900 text-white text-[10px] flex items-center justify-center font-black">4</span>
-              <span>Toppings</span>
-              <span className="text-[10px] text-stone-400 font-normal lowercase">(optional)</span>
-            </label>
-            <span className="text-xs font-bold text-stone-500">
+        {/* Step 4: Toppings */}
+        <fieldset>
+          <div className="mb-2.5 flex items-center justify-between">
+            <legend className="font-sans text-xs sm:text-sm font-bold text-ink uppercase tracking-wider">
+              4. Toppings <span className="font-normal text-ink-soft normal-case">(optional)</span>
+            </legend>
+            <span className="font-sans text-xs text-ink-soft">
               {selectedToppings.length} selected
             </span>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="grid gap-2">
             {TOPPING_OPTIONS.map((topping) => {
-              const isSelected = selectedToppings.includes(topping.name);
+              const selected = selectedToppings.includes(topping.name);
               return (
                 <button
-                  key={topping.name}
+                  key={topping.id}
                   type="button"
+                  aria-pressed={selected}
                   onClick={() => toggleTopping(topping.name)}
-                  className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between active:scale-98 ${
-                    isSelected
-                      ? 'border-amber-900 bg-amber-50/90 ring-2 ring-amber-900/20 shadow-xs'
-                      : 'border-stone-200 bg-white hover:border-amber-300 hover:bg-stone-50/50'
+                  className={`flex min-h-12 items-center justify-between rounded-2xl border px-4 text-left transition-all cursor-pointer ${
+                    selected
+                      ? 'border-caramel bg-caramel/10'
+                      : 'border-line bg-white hover:border-caramel/70'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-colors ${
-                        isSelected
-                          ? 'bg-amber-900 border-amber-900 text-white'
-                          : 'border-stone-300 bg-white'
+                  <span className="flex items-center gap-3 font-sans text-xs sm:text-sm font-bold text-ink">
+                    <span
+                      className={`flex size-5 items-center justify-center rounded-full border transition-colors ${
+                        selected
+                          ? 'border-caramel bg-caramel text-espresso-dark'
+                          : 'border-line bg-cream-deep'
                       }`}
                     >
-                      {isSelected && <Check className="w-3.5 h-3.5 stroke-2" />}
-                    </div>
-                    <span className="text-xs font-black text-stone-850">
-                      {topping.name}
+                      {selected && <Check className="size-3.5 stroke-3" />}
                     </span>
-                  </div>
-
-                  <span className="text-xs font-extrabold text-amber-950">
+                    <span>{topping.name}</span>
+                  </span>
+                  <span className="font-sans text-xs font-bold text-ink-soft">
                     +{formatUsd(topping.price)}
                   </span>
                 </button>
               );
             })}
           </div>
-        </section>
+        </fieldset>
       </div>
 
-      {/* Modal Bottom Checkout Bar */}
-      <div className="p-4 sm:p-5 border-t border-stone-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
-        {/* Quantity Controls */}
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-          <span className="text-xs font-black text-stone-600 sm:hidden uppercase">Qty:</span>
-          <div className="flex items-center border border-stone-200 rounded-2xl p-1 bg-stone-50">
-            <button
-              type="button"
-              onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-              disabled={quantity <= 1}
-              className="w-9 h-9 rounded-xl bg-white text-stone-700 hover:bg-stone-100 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-colors cursor-pointer"
-              aria-label="Decrease quantity"
-            >
-              <Minus className="w-3.5 h-3.5" />
-            </button>
-            <span className="w-10 text-center font-black text-sm text-stone-900">
-              {quantity}
+      {/* V0-Styled Sticky Bottom Bar */}
+      <div className="border-t border-line bg-cream/95 px-5 sm:px-8 py-4 backdrop-blur-md flex items-center gap-3 shrink-0">
+        {/* Quantity Stepper */}
+        <div className="flex h-12 items-center rounded-2xl border border-line bg-cream-deep p-1">
+          <button
+            type="button"
+            aria-label="Decrease quantity"
+            disabled={quantity <= 1}
+            onClick={() => setQuantity((c) => Math.max(1, c - 1))}
+            className="flex size-10 items-center justify-center rounded-xl text-ink-soft transition hover:bg-cream disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+          >
+            <Minus className="size-4" />
+          </button>
+          <span aria-live="polite" className="w-8 text-center font-sans text-sm font-black text-ink">
+            {quantity}
+          </span>
+          <button
+            type="button"
+            aria-label="Increase quantity"
+            disabled={quantity >= 20}
+            onClick={() => setQuantity((c) => Math.min(20, c + 1))}
+            className="flex size-10 items-center justify-center rounded-xl text-ink-soft transition hover:bg-cream cursor-pointer"
+          >
+            <Plus className="size-4" />
+          </button>
+        </div>
+
+        {/* Caramel Add to Order Button */}
+        <button
+          type="button"
+          disabled={!product.is_available}
+          onClick={handleConfirm}
+          className="h-12 flex-1 rounded-2xl bg-caramel hover:bg-caramel-soft font-sans text-sm font-black text-espresso-dark shadow-md shadow-caramel/20 flex items-center justify-between px-5 transition-all cursor-pointer active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span className="flex flex-col items-start leading-tight">
+            <span>{product.is_available ? 'Add to order' : 'Sold out'}</span>
+            <span className="text-[11px] font-semibold opacity-80">
+              {formatUsd(subtotal)} · {formatKhr(subtotal)}
             </span>
-            <button
-              type="button"
-              onClick={() => setQuantity((prev) => Math.min(20, prev + 1))}
-              className="w-9 h-9 rounded-xl bg-white text-stone-700 hover:bg-stone-100 flex items-center justify-center shadow-2xs transition-colors cursor-pointer"
-              aria-label="Increase quantity"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Action Button & Calculated Total Price */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
-          <div className="flex items-center gap-2.5 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 sm:flex-none px-4 py-3 rounded-2xl text-xs font-bold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="button"
-              disabled={!product.is_available}
-              onClick={handleConfirm}
-              className="flex-2 sm:flex-none px-6 py-3.5 rounded-2xl bg-amber-900 hover:bg-amber-950 text-white font-black text-xs sm:text-sm shadow-lg shadow-amber-950/20 active:scale-98 transition-all flex items-center justify-between sm:justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5">
-                <span>
-                  {product.is_available ? 'Add to cart' : 'Sold out'}
-                </span>
-              </span>
-              <span className="bg-amber-950/60 px-2.5 py-1 rounded-xl text-xs font-mono font-bold tracking-tight text-amber-200">
-                {formatUsd(subtotal)} ({formatKhr(subtotal)})
-              </span>
-            </button>
-          </div>
-        </div>
+          </span>
+          <ChevronRight className="size-5" />
+        </button>
       </div>
     </div>
   );

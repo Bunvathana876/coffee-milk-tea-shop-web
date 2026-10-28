@@ -17,73 +17,73 @@ export const CartItem: React.FC<CartItemProps> = ({
   onRemove,
 }) => {
   return (
-    <div className="bg-white rounded-3xl border border-stone-200/90 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all hover:shadow-sm">
+    <div className="bg-white rounded-3xl border border-line p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all hover:border-caramel/40 hover:shadow-sm">
       {/* Product Image & Details */}
       <div className="flex items-center gap-3.5 sm:gap-4 w-full sm:w-auto">
         {item.image ? (
           <img
             src={item.image}
             alt={item.productName}
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shrink-0 border border-stone-200/80 shadow-2xs"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shrink-0 border border-line shadow-2xs"
           />
         ) : (
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-amber-50 text-amber-800 flex items-center justify-center shrink-0">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-cream-deep text-caramel flex items-center justify-center shrink-0 border border-line">
             <Coffee className="w-8 h-8" />
           </div>
         )}
 
         <div className="space-y-1.5 flex-1 min-w-0">
-          <h3 className="font-extrabold text-stone-900 text-sm sm:text-base truncate">
+          <h3 className="font-serif font-bold text-ink text-sm sm:text-base truncate">
             {item.productName}
           </h3>
 
           {/* Customization Recipe Pills */}
-          <div className="flex flex-wrap gap-1.5 text-[11px] text-stone-600">
-            <span className="px-2 py-0.5 rounded-lg bg-stone-100 font-bold text-stone-700">
+          <div className="flex flex-wrap gap-1.5 text-[11px]">
+            <span className="px-2 py-0.5 rounded-lg bg-cream-deep text-ink-soft font-bold border border-line">
               Size: {item.size}
             </span>
-            <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-900 font-bold border border-amber-200/50">
-              {item.sugarLevel} Sugar
+            <span className="px-2 py-0.5 rounded-lg bg-caramel/15 text-espresso font-bold border border-caramel/25">
+              {item.sugarLevel} Sweet
             </span>
-            <span className="px-2 py-0.5 rounded-lg bg-stone-100 font-bold text-stone-700">
+            <span className="px-2 py-0.5 rounded-lg bg-cream-deep text-ink-soft font-bold border border-line">
               {item.iceLevel}
             </span>
             {item.toppings?.map((topping) => (
               <span
                 key={topping}
-                className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-900 font-bold border border-emerald-200/50"
+                className="px-2 py-0.5 rounded-lg bg-matcha/15 text-matcha font-bold border border-matcha/25"
               >
                 + {topping}
               </span>
             ))}
           </div>
 
-          <div className="text-xs text-stone-500 font-mono">
+          <div className="text-xs text-ink-soft font-medium">
             {formatUsd(item.unitPriceUsd)} each
           </div>
         </div>
       </div>
 
       {/* Quantity & Subtotal Controls */}
-      <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-stone-100">
+      <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-line">
         {/* Quantity Toggle Stepper */}
-        <div className="flex items-center border border-stone-200 rounded-2xl p-1 bg-stone-50">
+        <div className="flex items-center border border-line rounded-2xl p-1 bg-cream">
           <button
             type="button"
             onClick={() => onDecrease(item.id)}
-            className="w-8 h-8 rounded-xl bg-white text-stone-700 hover:bg-stone-100 flex items-center justify-center shadow-2xs transition-colors cursor-pointer active:scale-90"
+            className="w-8 h-8 rounded-xl bg-white text-ink hover:bg-cream-deep flex items-center justify-center shadow-2xs transition-colors cursor-pointer active:scale-90"
             aria-label="Decrease quantity"
             title="Decrease quantity"
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
-          <span className="w-9 text-center font-black text-xs sm:text-sm text-stone-900">
+          <span className="w-8 text-center font-bold text-xs sm:text-sm text-ink">
             {item.quantity}
           </span>
           <button
             type="button"
             onClick={() => onIncrease(item.id)}
-            className="w-8 h-8 rounded-xl bg-white text-stone-700 hover:bg-stone-100 flex items-center justify-center shadow-2xs transition-colors cursor-pointer active:scale-90"
+            className="w-8 h-8 rounded-xl bg-white text-ink hover:bg-cream-deep flex items-center justify-center shadow-2xs transition-colors cursor-pointer active:scale-90"
             aria-label="Increase quantity"
             title="Increase quantity"
           >
@@ -93,10 +93,10 @@ export const CartItem: React.FC<CartItemProps> = ({
 
         {/* Item Subtotal in USD & KHR */}
         <div className="text-right min-w-20">
-          <div className="font-black text-sm sm:text-base text-amber-950 tracking-tight">
+          <div className="font-serif font-black text-sm sm:text-base text-ink tracking-tight">
             {formatUsd(item.subtotalUsd)}
           </div>
-          <div className="text-[11px] text-stone-400 font-bold">
+          <div className="text-[11px] text-ink-soft font-medium">
             {formatKhr(item.subtotalUsd)}
           </div>
         </div>
@@ -105,7 +105,7 @@ export const CartItem: React.FC<CartItemProps> = ({
         <button
           type="button"
           onClick={() => onRemove(item.id)}
-          className="p-2 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+          className="p-2 text-ink-soft hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
           title="Remove from cart"
           aria-label={`Remove ${item.productName} from cart`}
         >

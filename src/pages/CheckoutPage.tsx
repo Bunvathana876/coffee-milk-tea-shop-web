@@ -8,13 +8,13 @@ import {
   QrCode,
   AlertCircle,
   Loader2,
-  CheckCircle2,
   Coffee,
-  Info,
   Sparkles,
   MapPin,
-  Clock,
   Banknote,
+  Truck,
+  Check,
+  ChevronRight,
 } from 'lucide-react';
 import { useCart } from '../features/cart/useCart';
 import { useAuth } from '../features/auth/AuthContext';
@@ -86,7 +86,7 @@ export const CheckoutPage: React.FC = () => {
     if (!customerName.trim()) {
       newErrors.customerName = 'Customer name is required.';
     } else if (customerName.trim().length < 2) {
-      newErrors.customerName = 'Please enter a valid customer name (at least 2 letters).';
+      newErrors.customerName = 'Please enter at least 2 characters.';
     }
 
     if (!customerPhone.trim()) {
@@ -96,7 +96,7 @@ export const CheckoutPage: React.FC = () => {
     }
 
     if (fulfillmentMode === 'delivery' && !deliveryAddress.trim()) {
-      newErrors.deliveryAddress = 'Please enter your delivery street address or building.';
+      newErrors.deliveryAddress = 'Please enter your street address or building.';
     }
 
     setErrors(newErrors);
@@ -200,171 +200,192 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto py-4 sm:py-8 space-y-6 sm:space-y-8">
-      {/* Navigation Header */}
-      <div className="flex items-center gap-3.5 border-b border-stone-200/80 pb-4">
-        <Link
-          to="/cart"
-          className="p-2.5 rounded-2xl text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer"
-          aria-label="Back to Cart"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-black text-stone-900 tracking-tight">
-            Checkout & Order
-          </h1>
-          <p className="text-xs sm:text-sm text-stone-500">
-            Choose pickup or delivery, confirm your drinks, and complete your order
+  // 1. Empty Cart State
+  if (items.length === 0) {
+    return (
+      <div className="max-w-md mx-auto my-12 bg-white rounded-3xl border border-line p-8 sm:p-12 text-center space-y-4 shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-cream-deep text-espresso flex items-center justify-center mx-auto shadow-inner">
+          <ShoppingBag className="w-8 h-8 text-espresso" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-xl font-serif font-black text-ink">Your Cart is Empty</h2>
+          <p className="text-xs sm:text-sm text-ink-soft max-w-sm mx-auto">
+            You must add at least one handcrafted coffee or bubble tea before checking out.
           </p>
+        </div>
+        <div className="pt-2">
+          <Link to="/menu">
+            <Button variant="primary">Explore Drink Menu</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Guest Sign-In / Register Gate (keeps cart safe)
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-lg mx-auto my-10 bg-white rounded-3xl border border-line p-7 sm:p-10 text-center space-y-6 shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-espresso text-caramel flex items-center justify-center mx-auto shadow-sm">
+          <User className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-serif font-black text-ink tracking-tight">
+            One quick step
+          </h2>
+          <p className="text-sm text-ink-soft leading-relaxed max-w-md mx-auto">
+            Sign in or create an account to place your order. Your {totalQuantity}{' '}
+            {totalQuantity === 1 ? 'drink is' : 'drinks are'} safely saved in your bag ({formatUsd(totalPriceUsd)}).
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <Button
+            variant="accent"
+            size="lg"
+            onClick={() => openAuthModalWith({ mode: 'register' })}
+            className="w-full"
+          >
+            Create free account (10s)
+          </Button>
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={() => openAuthModalWith({ mode: 'login' })}
+            className="w-full"
+          >
+            I already have an account
+          </Button>
+        </div>
+
+        <Link to="/menu" className="inline-block text-xs font-bold text-ink-soft hover:text-ink transition-colors">
+          ← Keep browsing menu
+        </Link>
+      </div>
+    );
+  }
+
+  // 3. Main Full-Featured Checkout Layout (v0 2-column structure)
+  return (
+    <div className="space-y-6 sm:space-y-8 max-w-6xl mx-auto">
+      {/* Top Header */}
+      <div className="flex items-center justify-between border-b border-line/60 pb-4">
+        <Link
+          to="/menu"
+          className="inline-flex items-center gap-2 rounded-xl px-2 py-1 font-sans text-xs sm:text-sm font-bold text-ink-soft hover:text-ink transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to menu</span>
+        </Link>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-espresso text-caramel flex items-center justify-center">
+            <Coffee className="w-4 h-4" />
+          </div>
+          <span className="font-serif text-base sm:text-lg font-bold text-ink">Brew &amp; Boba</span>
         </div>
       </div>
 
-      {/* Empty Cart Warning */}
-      {items.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-stone-200/90 p-8 sm:p-12 text-center space-y-4 shadow-xs">
-          <div className="w-16 h-16 rounded-3xl bg-amber-50 text-amber-900 border border-amber-200/60 flex items-center justify-center mx-auto shadow-2xs">
-            <ShoppingBag className="w-8 h-8 text-amber-800" />
-          </div>
-          <div className="space-y-1">
-            <h2 className="text-lg font-black text-stone-900">Your Cart is Empty</h2>
-            <p className="text-xs sm:text-sm text-stone-500 max-w-sm mx-auto">
-              You must add at least one handcrafted coffee or milk tea before proceeding to checkout.
+      {/* Main 2-Column Checkout Grid */}
+      <form onSubmit={handlePlaceOrder} className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-start">
+        {/* Left Column: Form Details */}
+        <div className="space-y-6">
+          {/* Header Title */}
+          <div>
+            <p className="font-sans text-xs font-bold uppercase tracking-wider text-caramel">
+              Almost yours
+            </p>
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-black text-ink tracking-tight mt-1">
+              Complete your order
+            </h1>
+            <p className="mt-2 font-sans text-xs sm:text-sm text-ink-soft">
+              Choose pickup or delivery, confirm your details, and place your order.
             </p>
           </div>
-          <div className="pt-2">
-            <Link to="/menu">
-              <Button variant="primary">Explore Menu</Button>
-            </Link>
-          </div>
-        </div>
-      ) : !isAuthenticated ? (
-        /* Guests: one quick step to sign in or sign up, cart is kept */
-        <div className="bg-white rounded-3xl border border-stone-200 p-7 sm:p-10 text-center space-y-6 shadow-sm max-w-lg mx-auto">
-          <div className="w-14 h-14 rounded-full bg-stone-950 text-amber-300 flex items-center justify-center mx-auto">
-            <User className="w-6 h-6" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl font-serif font-black text-stone-900 tracking-tight">
-              One quick step
-            </h2>
-            <p className="text-sm text-stone-500">
-              Sign in or create an account to place your order. Your {totalQuantity}{' '}
-              {totalQuantity === 1 ? 'drink is' : 'drinks are'} saved ({formatUsd(totalPriceUsd)}).
-            </p>
-          </div>
-          <div className="flex flex-col gap-3">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => openAuthModalWith({ mode: 'register' })}
-              className="w-full"
-            >
-              Create account
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => openAuthModalWith({ mode: 'login' })}
-              className="w-full"
-            >
-              I already have an account
-            </Button>
-          </div>
-          <Link to="/menu" className="inline-block text-sm font-bold text-stone-500 hover:text-stone-900">
-            Keep browsing
-          </Link>
-        </div>
-      ) : (
-        <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-          {/* Left Column: Fulfillment, Contact, Notes & Payment Method (7 Cols) */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Global Error Banner */}
-            {submitError && (
-              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-3 animate-in fade-in">
-                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-                <div className="text-xs sm:text-sm space-y-1 flex-1">
-                  <p className="font-bold">Failed to Place Order</p>
-                  <p className="text-rose-700 leading-relaxed">{submitError}</p>
-                </div>
-              </div>
-            )}
 
-            {/* 1. Fulfillment Mode: Pickup or Delivery */}
-            <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-7 shadow-xs space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-stone-100">
-                <div className="w-8 h-8 rounded-xl bg-amber-900 text-white flex items-center justify-center font-black text-xs shadow-2xs">
-                  1
-                </div>
-                <div>
-                  <h2 className="font-serif font-black text-base text-stone-900 tracking-tight">
-                    Order Fulfillment
-                  </h2>
-                  <p className="text-[11px] text-stone-500">
-                    How would you like to receive your drinks?
-                  </p>
-                </div>
+          {/* Global Error Banner */}
+          {submitError && (
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-3 animate-in fade-in">
+              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+              <div className="text-xs sm:text-sm space-y-1 flex-1">
+                <p className="font-bold">Could not place order</p>
+                <p className="text-rose-700 leading-relaxed">{submitError}</p>
               </div>
+            </div>
+          )}
 
-              {/* Mode Toggle Buttons */}
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setFulfillmentMode('pickup')}
-                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                    fulfillmentMode === 'pickup'
-                      ? 'border-amber-900 bg-amber-50/80 ring-2 ring-amber-900/30 shadow-xs'
-                      : 'border-stone-200 bg-white hover:bg-stone-50'
+          {/* Section 1: Fulfillment Mode (Pickup vs Delivery) */}
+          <section className="rounded-3xl border border-line bg-white/70 p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-serif font-black text-lg sm:text-xl text-ink">
+                  How would you like it?
+                </h2>
+                <p className="mt-0.5 text-xs text-ink-soft">We'll have it ready fresh for you.</p>
+              </div>
+              <MapPin className="w-5 h-5 text-caramel" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5 rounded-2xl bg-cream-deep p-1.5 border border-line/40">
+              {/* Pickup Option */}
+              <button
+                type="button"
+                onClick={() => setFulfillmentMode('pickup')}
+                aria-pressed={fulfillmentMode === 'pickup'}
+                className={`min-h-[76px] rounded-xl px-3.5 py-3 text-left transition-all cursor-pointer ${
+                  fulfillmentMode === 'pickup'
+                    ? 'bg-espresso text-cream shadow-sm'
+                    : 'text-ink-soft hover:bg-cream hover:text-ink'
+                }`}
+              >
+                <span className="flex items-center gap-2 font-sans text-sm font-bold">
+                  <ShoppingBag className="w-4 h-4 text-caramel" />
+                  <span>Café Pickup</span>
+                </span>
+                <span
+                  className={`mt-1.5 block pl-6 font-sans text-[11px] font-medium leading-tight ${
+                    fulfillmentMode === 'pickup' ? 'text-cream/70' : 'text-ink-soft'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-stone-900 flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-amber-900" />
-                      <span>Café Pickup</span>
-                    </span>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      Free
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-stone-500 mt-2 block">
-                    Ready in ~10 mins • Street 214, BKK1, Phnom Penh
-                  </span>
-                </button>
+                  Ready in 10–15 min · BKK1
+                </span>
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => setFulfillmentMode('delivery')}
-                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                    fulfillmentMode === 'delivery'
-                      ? 'border-amber-900 bg-amber-50/80 ring-2 ring-amber-900/30 shadow-xs'
-                      : 'border-stone-200 bg-white hover:bg-stone-50'
+              {/* Delivery Option */}
+              <button
+                type="button"
+                onClick={() => setFulfillmentMode('delivery')}
+                aria-pressed={fulfillmentMode === 'delivery'}
+                className={`min-h-[76px] rounded-xl px-3.5 py-3 text-left transition-all cursor-pointer ${
+                  fulfillmentMode === 'delivery'
+                    ? 'bg-espresso text-cream shadow-sm'
+                    : 'text-ink-soft hover:bg-cream hover:text-ink'
+                }`}
+              >
+                <span className="flex items-center gap-2 font-sans text-sm font-bold">
+                  <Truck className="w-4 h-4 text-caramel" />
+                  <span>Local Delivery</span>
+                </span>
+                <span
+                  className={`mt-1.5 block pl-6 font-sans text-[11px] font-medium leading-tight ${
+                    fulfillmentMode === 'delivery' ? 'text-cream/70' : 'text-ink-soft'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-stone-900 flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-amber-900" />
-                      <span>Local Delivery</span>
-                    </span>
-                    <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full">
-                      ~30 mins
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-stone-500 mt-2 block">
-                    Direct to your doorstep anywhere in Phnom Penh
-                  </span>
-                </button>
-              </div>
+                  Arrives in 25–35 min
+                </span>
+              </button>
+            </div>
 
-              {/* Delivery Address Input (If Delivery selected) */}
-              {fulfillmentMode === 'delivery' && (
-                <div className="pt-2 animate-in fade-in">
-                  <label
-                    htmlFor="deliveryAddress"
-                    className="block text-xs font-black text-stone-700 uppercase tracking-wider mb-1.5"
-                  >
-                    Delivery Address / Building <span className="text-rose-500">*</span>
-                  </label>
+            {/* Delivery Address Input */}
+            {fulfillmentMode === 'delivery' && (
+              <div className="pt-2 space-y-1.5 animate-in fade-in">
+                <label
+                  htmlFor="deliveryAddress"
+                  className="block text-xs font-bold text-ink uppercase tracking-wider"
+                >
+                  Delivery Street Address or Building <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <MapPin className="w-4 h-4 text-ink-soft absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     id="deliveryAddress"
                     type="text"
@@ -375,406 +396,314 @@ export const CheckoutPage: React.FC = () => {
                         setErrors((prev) => ({ ...prev, deliveryAddress: undefined }));
                       }
                     }}
-                    placeholder="e.g. Condo / House #12, St 310, Boeung Keng Kang 1"
-                    className={`w-full bg-stone-50/70 border rounded-2xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:bg-white transition-all ${
+                    placeholder="e.g. Condo #402, Street 310, BKK1, Phnom Penh"
+                    className={`min-h-12 w-full rounded-2xl border bg-cream pl-11 pr-4 font-sans text-sm outline-none transition placeholder:text-ink-soft/60 ${
                       errors.deliveryAddress
-                        ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
-                        : 'border-stone-200 focus:border-amber-900 focus:ring-2 focus:ring-amber-900/20'
+                        ? 'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
+                        : 'border-line focus:border-caramel focus:ring-2 focus:ring-caramel/20'
                     }`}
                   />
-                  {errors.deliveryAddress && (
-                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                      {errors.deliveryAddress}
-                    </p>
-                  )}
                 </div>
-              )}
+                {errors.deliveryAddress && (
+                  <p className="text-xs text-rose-600 font-semibold">{errors.deliveryAddress}</p>
+                )}
+              </div>
+            )}
+          </section>
+
+          {/* Section 2: Contact Details & Barista Notes */}
+          <section className="rounded-3xl border border-line bg-white/70 p-5 sm:p-6 shadow-xs space-y-4">
+            <div>
+              <h2 className="font-serif font-black text-lg sm:text-xl text-ink">
+                Your Details
+              </h2>
+              <p className="mt-0.5 text-xs text-ink-soft">
+                We'll notify your phone as soon as your drinks are prepared.
+              </p>
             </div>
 
-            {/* 2. Customer Information Card */}
-            <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-7 shadow-xs space-y-5">
-              <div className="flex items-center gap-3 pb-3 border-b border-stone-100">
-                <div className="w-8 h-8 rounded-xl bg-amber-900 text-white flex items-center justify-center font-black text-xs shadow-2xs">
-                  2
-                </div>
-                <div>
-                  <h2 className="font-serif font-black text-base text-stone-900 tracking-tight">
-                    Contact Information
-                  </h2>
-                  <p className="text-[11px] text-stone-500">
-                    We will notify your phone when drinks are ready
-                  </p>
-                </div>
-              </div>
-
-              {isAuthenticated && user && (
-                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 text-xs font-semibold flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>
-                    Signed in as <strong>{user.full_name}</strong>. Earning <strong>+1 Loyalty Stamp</strong> on this order!
-                  </span>
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Customer Name Input */}
-                <div>
-                  <label
-                    htmlFor="customerName"
-                    className="block text-xs font-black text-stone-700 uppercase tracking-wider mb-1.5"
-                  >
-                    Your Name <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="customerName"
-                      type="text"
-                      name="name"
-                      autoComplete="name"
-                      value={customerName}
-                      disabled={isLoading}
-                      onChange={(e) => {
-                        setCustomerName(e.target.value);
-                        if (errors.customerName) {
-                          setErrors((prev) => ({ ...prev, customerName: undefined }));
-                        }
-                      }}
-                      placeholder="e.g. Sokha Chan"
-                      className={`w-full bg-stone-50/70 border rounded-2xl pl-10 pr-4 py-3 text-xs sm:text-sm focus:outline-none focus:bg-white transition-all ${
-                        errors.customerName
-                          ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
-                          : 'border-stone-200 focus:border-amber-900 focus:ring-2 focus:ring-amber-900/20'
-                      }`}
-                    />
-                    <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
-                  </div>
-                  {errors.customerName && (
-                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                      {errors.customerName}
-                    </p>
-                  )}
-                </div>
-
-                {/* Customer Phone Input */}
-                <div>
-                  <label
-                    htmlFor="customerPhone"
-                    className="block text-xs font-black text-stone-700 uppercase tracking-wider mb-1.5"
-                  >
-                    Phone Number <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="customerPhone"
-                      type="tel"
-                      name="tel"
-                      inputMode="tel"
-                      autoComplete="tel"
-                      value={customerPhone}
-                      disabled={isLoading}
-                      onChange={(e) => {
-                        setCustomerPhone(e.target.value);
-                        if (errors.customerPhone) {
-                          setErrors((prev) => ({ ...prev, customerPhone: undefined }));
-                        }
-                      }}
-                      placeholder="e.g. 012 345 678"
-                      className={`w-full bg-stone-50/70 border rounded-2xl pl-10 pr-4 py-3 text-xs sm:text-sm focus:outline-none focus:bg-white transition-all ${
-                        errors.customerPhone
-                          ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
-                          : 'border-stone-200 focus:border-amber-900 focus:ring-2 focus:ring-amber-900/20'
-                      }`}
-                    />
-                    <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5" />
-                  </div>
-                  {errors.customerPhone && (
-                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                      {errors.customerPhone}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Barista Special Instructions / Notes */}
-              <div>
-                <label
-                  htmlFor="orderNotes"
-                  className="block text-xs font-black text-stone-700 uppercase tracking-wider mb-1.5"
-                >
-                  Barista Notes / Special Requests <span className="text-[10px] text-stone-400 font-normal lowercase">(optional)</span>
-                </label>
-                <textarea
-                  id="orderNotes"
-                  rows={2}
-                  value={orderNotes}
-                  onChange={(e) => setOrderNotes(e.target.value)}
-                  placeholder="e.g. Please pack ice separately, extra napkins, or delivery instructions..."
-                  className="w-full bg-stone-50/70 border border-stone-200 rounded-2xl p-3 text-xs sm:text-sm focus:outline-none focus:bg-white focus:border-amber-900 focus:ring-2 focus:ring-amber-900/20 transition-all resize-none"
-                />
-
-                {/* Quick note suggestion chips */}
-                <div className="flex flex-wrap gap-1.5 pt-2">
-                  {quickNotes.map((note) => (
-                    <button
-                      key={note}
-                      type="button"
-                      onClick={() => handleAddQuickNote(note)}
-                      className="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-stone-100 hover:bg-amber-50 hover:text-amber-950 text-stone-600 border border-stone-200 transition-colors cursor-pointer"
-                    >
-                      + {note}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* 3. Payment Method Card */}
-            <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-7 shadow-xs space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-stone-100">
-                <div className="w-8 h-8 rounded-xl bg-amber-900 text-white flex items-center justify-center font-black text-xs shadow-2xs">
-                  3
-                </div>
-                <div>
-                  <h2 className="font-serif font-black text-base text-stone-900 tracking-tight">
-                    Payment Method
-                  </h2>
-                  <p className="text-[11px] text-stone-500">
-                    Choose how you would like to settle your order
-                  </p>
-                </div>
-              </div>
-
-              {/* Payment Method Radio Options */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* ABA KHQR Option */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('khqr')}
-                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
-                    paymentMethod === 'khqr'
-                      ? 'border-amber-900 bg-amber-50/80 ring-2 ring-amber-900/30 shadow-xs'
-                      : 'border-stone-200 bg-white hover:bg-stone-50'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-amber-900 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                    <QrCode className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-black text-xs sm:text-sm text-stone-900">
-                        ABA KHQR
-                      </span>
-                      {paymentMethod === 'khqr' && (
-                        <span className="text-[10px] font-black uppercase text-amber-900 bg-amber-200/60 px-2 py-0.5 rounded-full">
-                          Selected
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-stone-500 mt-1 leading-snug">
-                      Scan with Bakong or any Cambodian bank
-                    </p>
-                  </div>
-                </button>
-
-                {/* Cash on Pickup / Delivery Option */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('cash')}
-                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
-                    paymentMethod === 'cash'
-                      ? 'border-amber-900 bg-amber-50/80 ring-2 ring-amber-900/30 shadow-xs'
-                      : 'border-stone-200 bg-white hover:bg-stone-50'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-stone-800 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                    <Banknote className="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-black text-xs sm:text-sm text-stone-900">
-                        Cash on {fulfillmentMode === 'pickup' ? 'Pickup' : 'Delivery'}
-                      </span>
-                      {paymentMethod === 'cash' && (
-                        <span className="text-[10px] font-black uppercase text-amber-900 bg-amber-200/60 px-2 py-0.5 rounded-full">
-                          Selected
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-stone-500 mt-1 leading-snug">
-                      Pay in USD ($) or KHR (៛) in person
-                    </p>
-                  </div>
-                </button>
-              </div>
-
-              {/* ABA KHQR Demo Note */}
-              {paymentMethod === 'khqr' && (
-                <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-300/80 text-amber-950 space-y-1.5 animate-in fade-in">
-                  <div className="flex items-center gap-2 font-bold text-xs text-amber-900">
-                    <Info className="w-4 h-4 text-amber-800 shrink-0" />
-                    <span>Instant scan via Bakong, ABA, ACLEDA, Wing, Canadia & more</span>
-                  </div>
-                  <p className="text-[11px] text-amber-900/90 leading-relaxed pl-6">
-                    A universal KHQR code will be displayed after placing your order with live payment status verification.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right Column: Order Summary & Action (5 Cols) */}
-          <div className="lg:col-span-5 space-y-6 sticky top-24">
-            <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-7 shadow-xs space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-stone-100">
-                <h2 className="font-serif font-black text-base text-stone-900 flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-amber-900" />
-                  <span>Order Summary</span>
-                </h2>
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700">
-                  {totalQuantity} {totalQuantity === 1 ? 'item' : 'items'}
+            {user && (
+              <div className="p-3 rounded-2xl bg-cream-deep border border-line/60 text-xs font-semibold text-ink flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-caramel shrink-0" />
+                <span>
+                  Ordering as <strong>{user.full_name}</strong> · Earning +1 Loyalty Stamp!
                 </span>
               </div>
+            )}
 
-              {/* Items List */}
-              <div className="divide-y divide-stone-100 max-h-72 overflow-y-auto pr-1">
-                {items.map((item) => (
-                  <div key={item.id} className="py-3.5 first:pt-0 last:pb-0 flex items-start gap-3">
-                    {/* Item Thumbnail */}
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.productName}
-                        className="w-12 h-12 rounded-xl object-cover shrink-0 border border-stone-200/70"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-900 flex items-center justify-center shrink-0">
-                        <Coffee className="w-6 h-6" />
-                      </div>
-                    )}
+            <div className="grid gap-4 sm:grid-cols-2">
+              {/* Name */}
+              <div>
+                <label htmlFor="customerName" className="block text-xs font-bold text-ink mb-1.5">
+                  Your Name <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-ink-soft absolute left-4 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="customerName"
+                    type="text"
+                    value={customerName}
+                    disabled={isLoading}
+                    onChange={(e) => {
+                      setCustomerName(e.target.value);
+                      if (errors.customerName) setErrors((prev) => ({ ...prev, customerName: undefined }));
+                    }}
+                    placeholder="e.g. Sopheak Chan"
+                    className={`min-h-12 w-full rounded-2xl border bg-cream pl-11 pr-4 font-sans text-sm outline-none transition placeholder:text-ink-soft/60 ${
+                      errors.customerName
+                        ? 'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
+                        : 'border-line focus:border-caramel focus:ring-2 focus:ring-caramel/20'
+                    }`}
+                  />
+                </div>
+                {errors.customerName && (
+                  <p className="text-xs text-rose-600 font-semibold mt-1">{errors.customerName}</p>
+                )}
+              </div>
 
-                    {/* Drink Details & Customizations */}
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <h3 className="font-serif font-bold text-xs sm:text-sm text-stone-900 truncate">
-                          {item.productName}
-                        </h3>
-                        <span className="font-black text-xs text-amber-950 shrink-0">
-                          {formatUsd(item.subtotalUsd)}
-                        </span>
-                      </div>
+              {/* Phone */}
+              <div>
+                <label htmlFor="customerPhone" className="block text-xs font-bold text-ink mb-1.5">
+                  Phone Number <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <Phone className="w-4 h-4 text-ink-soft absolute left-4 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="customerPhone"
+                    type="tel"
+                    inputMode="tel"
+                    value={customerPhone}
+                    disabled={isLoading}
+                    onChange={(e) => {
+                      setCustomerPhone(e.target.value);
+                      if (errors.customerPhone) setErrors((prev) => ({ ...prev, customerPhone: undefined }));
+                    }}
+                    placeholder="e.g. 012 345 678"
+                    className={`min-h-12 w-full rounded-2xl border bg-cream pl-11 pr-4 font-sans text-sm outline-none transition placeholder:text-ink-soft/60 ${
+                      errors.customerPhone
+                        ? 'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
+                        : 'border-line focus:border-caramel focus:ring-2 focus:ring-caramel/20'
+                    }`}
+                  />
+                </div>
+                {errors.customerPhone && (
+                  <p className="text-xs text-rose-600 font-semibold mt-1">{errors.customerPhone}</p>
+                )}
+              </div>
+            </div>
 
-                      {/* Customization Pills */}
-                      <div className="flex flex-wrap gap-1 text-[10px] text-stone-500">
-                        <span className="px-1.5 py-0.5 rounded-md bg-stone-100 font-bold">
-                          {item.size}
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded-md bg-stone-100 font-bold">
-                          {item.sugarLevel}
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded-md bg-stone-100 font-bold">
-                          {item.iceLevel}
-                        </span>
-                        {item.toppings?.map((t) => (
-                          <span key={t} className="px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-900 font-bold">
-                            +{t}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Quantity & Unit Price */}
-                      <div className="text-[11px] text-stone-500 flex items-center justify-between">
-                        <span>
-                          Qty: <strong className="text-stone-800">{item.quantity}</strong> × {formatUsd(item.unitPriceUsd)}
-                        </span>
-                        <span className="text-[10px] text-stone-400 font-bold">
-                          {formatKhr(item.subtotalUsd)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+            {/* Notes */}
+            <div className="pt-1">
+              <label htmlFor="orderNotes" className="block text-xs font-bold text-ink mb-1.5">
+                Barista notes <span className="font-normal text-ink-soft">(optional)</span>
+              </label>
+              <textarea
+                id="orderNotes"
+                rows={2}
+                value={orderNotes}
+                onChange={(e) => setOrderNotes(e.target.value)}
+                placeholder="e.g. Pack ice separately, extra napkins, leave at guard house..."
+                className="w-full resize-none rounded-2xl border border-line bg-cream px-4 py-3 font-sans text-sm outline-none transition placeholder:text-ink-soft/60 focus:border-caramel focus:ring-2 focus:ring-caramel/20"
+              />
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {quickNotes.map((note) => (
+                  <button
+                    key={note}
+                    type="button"
+                    onClick={() => handleAddQuickNote(note)}
+                    className="text-[11px] font-bold px-3 py-1 rounded-full bg-cream-deep hover:bg-caramel/20 hover:text-espresso text-ink-soft border border-line/60 transition-colors cursor-pointer"
+                  >
+                    + {note}
+                  </button>
                 ))}
               </div>
+            </div>
+          </section>
 
-              {/* Totals Section */}
-              <div className="pt-3 border-t border-stone-100 space-y-2 text-xs">
-                {/* Subtotal */}
-                <div className="flex justify-between items-start text-stone-600">
-                  <span className="font-semibold">Subtotal</span>
-                  <div className="text-right">
-                    <div className="font-black text-stone-900 text-sm">
-                      {formatUsd(subtotalUsd)}
+          {/* Section 3: Payment Method */}
+          <section className="rounded-3xl border border-line bg-white/70 p-5 sm:p-6 shadow-xs space-y-4">
+            <div>
+              <h2 className="font-serif font-black text-lg sm:text-xl text-ink">
+                Payment Method
+              </h2>
+              <p className="mt-0.5 text-xs text-ink-soft">Secure and simple, dual currency supported.</p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {/* KHQR */}
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('khqr')}
+                aria-pressed={paymentMethod === 'khqr'}
+                className={`relative flex min-h-[76px] items-center gap-3.5 rounded-2xl border p-4 text-left transition-all cursor-pointer ${
+                  paymentMethod === 'khqr'
+                    ? 'border-caramel bg-caramel/10 ring-1 ring-caramel'
+                    : 'border-line bg-cream hover:border-caramel/60'
+                }`}
+              >
+                <div
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                    paymentMethod === 'khqr' ? 'bg-espresso text-caramel' : 'bg-cream-deep text-ink-soft'
+                  }`}
+                >
+                  <QrCode className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="block font-sans text-sm font-bold text-ink">ABA KHQR</span>
+                  <span className="block font-sans text-xs text-ink-soft mt-0.5">
+                    Scan to pay with any bank app
+                  </span>
+                </div>
+                {paymentMethod === 'khqr' && (
+                  <Check className="w-5 h-5 text-caramel absolute right-4 top-4" />
+                )}
+              </button>
+
+              {/* Cash */}
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('cash')}
+                aria-pressed={paymentMethod === 'cash'}
+                className={`relative flex min-h-[76px] items-center gap-3.5 rounded-2xl border p-4 text-left transition-all cursor-pointer ${
+                  paymentMethod === 'cash'
+                    ? 'border-caramel bg-caramel/10 ring-1 ring-caramel'
+                    : 'border-line bg-cream hover:border-caramel/60'
+                }`}
+              >
+                <div
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                    paymentMethod === 'cash' ? 'bg-espresso text-caramel' : 'bg-cream-deep text-ink-soft'
+                  }`}
+                >
+                  <Banknote className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="block font-sans text-sm font-bold text-ink">
+                    Cash on {fulfillmentMode === 'pickup' ? 'Pickup' : 'Delivery'}
+                  </span>
+                  <span className="block font-sans text-xs text-ink-soft mt-0.5">
+                    Pay in USD ($) or KHR (៛) in person
+                  </span>
+                </div>
+                {paymentMethod === 'cash' && (
+                  <Check className="w-5 h-5 text-caramel absolute right-4 top-4" />
+                )}
+              </button>
+            </div>
+          </section>
+        </div>
+
+        {/* Right Column: Sticky Dark Espresso Order Summary Card */}
+        <aside className="lg:sticky lg:top-24">
+          <div className="overflow-hidden rounded-3xl bg-espresso text-cream shadow-2xl border border-espresso-dark">
+            {/* Header */}
+            <div className="border-b border-cream/10 px-6 py-5">
+              <p className="font-sans text-xs font-bold uppercase tracking-wider text-caramel-soft">
+                Order Summary
+              </p>
+              <h2 className="mt-1 font-serif text-2xl font-bold">
+                {totalQuantity} {totalQuantity === 1 ? 'Handcrafted Drink' : 'Handcrafted Drinks'}
+              </h2>
+            </div>
+
+            {/* Items List */}
+            <div className="px-6 py-4 max-h-72 overflow-y-auto divide-y divide-cream/10 scrollbar-none">
+              {items.map((item) => (
+                <div key={item.id} className="py-3.5 first:pt-0 last:pb-0 flex items-start gap-3">
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.productName}
+                      className="w-12 h-12 rounded-xl object-cover shrink-0 border border-white/10"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-cream/10 text-caramel flex items-center justify-center shrink-0">
+                      <Coffee className="w-5 h-5" />
                     </div>
-                    <div className="text-[11px] text-stone-400 font-bold mt-0.5">
-                      {formatKhr(subtotalUsd)}
+                  )}
+
+                  <div className="flex-1 min-w-0 space-y-0.5">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <h3 className="font-serif font-bold text-sm text-cream truncate">
+                        {item.productName}
+                      </h3>
+                      <span className="font-sans text-sm font-bold text-cream shrink-0 tabular-nums">
+                        {formatUsd(item.subtotalUsd)}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-cream/70 font-medium">
+                      {item.size} · {item.sugarLevel} sweet · {item.iceLevel}
+                    </p>
+
+                    {item.toppings && item.toppings.length > 0 && (
+                      <p className="text-xs text-caramel-soft">
+                        + {item.toppings.join(', ')}
+                      </p>
+                    )}
+
+                    <div className="text-[11px] text-cream/50 pt-0.5 flex items-center justify-between">
+                      <span>Qty: {item.quantity} × {formatUsd(item.unitPriceUsd)}</span>
+                      <span>{formatKhr(item.subtotalUsd)}</span>
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
 
-                {/* Packaging & Fulfillment */}
-                <div className="flex justify-between items-center text-stone-600 pt-1 border-t border-stone-50">
-                  <span>Takeaway Cup & Straw</span>
-                  <span className="font-bold text-emerald-700">Free</span>
-                </div>
+            {/* Cost Breakdown */}
+            <div className="border-t border-cream/10 px-6 py-5 space-y-3 font-sans text-sm">
+              <div className="flex justify-between text-cream/70">
+                <span>Subtotal</span>
+                <span className="font-bold text-cream tabular-nums">{formatUsd(subtotalUsd)}</span>
+              </div>
+              <div className="flex justify-between text-cream/70">
+                <span>Fulfillment ({fulfillmentMode === 'pickup' ? 'Pickup' : 'Delivery'})</span>
+                <span className="font-bold text-emerald-400">Free</span>
+              </div>
 
-                <div className="flex justify-between items-center text-stone-600">
-                  <span>Fulfillment ({fulfillmentMode === 'pickup' ? 'BKK1 Pickup' : 'Delivery'})</span>
-                  <span className="font-bold text-emerald-700">Free</span>
-                </div>
-
-                {/* Total Due in USD and KHR */}
-                <div className="pt-3 border-t border-stone-200 flex justify-between items-baseline">
+              <div className="my-3 border-t border-cream/15 pt-3">
+                <div className="flex items-end justify-between">
                   <div>
-                    <span className="text-xs font-black text-stone-700 uppercase tracking-wider block">
+                    <p className="text-xs text-cream/60 uppercase tracking-wider font-bold">
                       Total Due
-                    </span>
-                    <span className="text-[11px] text-stone-400 font-semibold">
-                      Rate: $1 = {formatKhr(1)}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl sm:text-3xl font-serif font-black text-amber-950 tracking-tight leading-none">
+                    </p>
+                    <p className="font-serif text-3xl font-black text-cream tabular-nums leading-none mt-1">
                       {formatUsd(totalPriceUsd)}
-                    </div>
-                    <div className="text-sm font-bold text-amber-800 mt-1">
-                      {formatKhr(totalPriceUsd)}
-                    </div>
+                    </p>
                   </div>
+                  <p className="text-sm font-black text-caramel-soft tabular-nums">
+                    {formatKhr(totalPriceUsd)}
+                  </p>
                 </div>
               </div>
 
-              {/* Submit Order Action Button */}
+              {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isLoading || items.length === 0}
-                aria-busy={isLoading}
-                className="w-full py-4 px-6 rounded-2xl bg-amber-900 hover:bg-amber-950 text-white font-black text-sm shadow-xl shadow-amber-950/20 active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isLoading}
+                className="mt-4 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-caramel font-sans text-sm font-black text-espresso-dark shadow-lg shadow-caramel/20 hover:bg-caramel-soft active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
-                    <span>Placing Your Order...</span>
+                    <Loader2 className="w-4 h-4 animate-spin text-espresso-dark" />
+                    <span>Placing your order...</span>
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-amber-300" />
-                    <span>
-                      Place Order • {formatUsd(totalPriceUsd)} ({formatKhr(totalPriceUsd)})
-                    </span>
+                    <span>Place order · {formatUsd(totalPriceUsd)}</span>
+                    <ChevronRight className="w-4 h-4" />
                   </>
                 )}
               </button>
 
-              <div className="flex items-center justify-center gap-2 text-[11px] text-stone-400 font-semibold">
-                <Clock className="w-3.5 h-3.5 text-amber-700" />
-                <span>Estimated ready time: 10–15 mins</span>
-              </div>
+              <p className="text-center font-sans text-[11px] text-cream/50 pt-1">
+                Your order will be linked to your account for live status tracking.
+              </p>
             </div>
           </div>
-        </form>
-      )}
+        </aside>
+      </form>
     </div>
   );
 };

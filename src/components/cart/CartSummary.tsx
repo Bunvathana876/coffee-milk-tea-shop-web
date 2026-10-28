@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, QrCode, Trash2, ShoppingBag } from 'lucide-react';
+import { ArrowRight, QrCode, Trash2, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { formatUsd, formatKhr } from '../../config/currency';
 import { Button } from '../common/Button';
 import { useAuth } from '../../features/auth/AuthContext';
@@ -17,80 +17,87 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
   totalQuantity,
   subtotalUsd,
   totalPriceUsd,
+  totalPriceKhr,
   onClearCart,
 }) => {
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
   const { isAuthenticated, openAuthModalWith } = useAuth();
 
   return (
-    <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-xs space-y-5 sticky top-24">
-      <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-        <h3 className="font-black text-base text-stone-900 flex items-center gap-2">
-          <ShoppingBag className="w-4 h-4 text-amber-900" />
+    <div className="bg-white rounded-3xl border border-line p-5 sm:p-6 shadow-xs space-y-5 sticky top-24">
+      {/* Summary Header */}
+      <div className="flex items-center justify-between border-b border-line pb-3.5">
+        <h3 className="font-serif font-black text-lg text-ink flex items-center gap-2">
+          <ShoppingBag className="w-4.5 h-4.5 text-caramel" />
           <span>Order Summary</span>
         </h3>
-        <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700">
+        <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-cream-deep text-ink">
           {totalQuantity} {totalQuantity === 1 ? 'drink' : 'drinks'}
         </span>
       </div>
 
       {/* Breakdown Rows */}
-      <div className="space-y-3 text-xs text-stone-600">
-        {/* Subtotal in USD & KHR */}
+      <div className="space-y-3 text-xs text-ink-soft">
         <div className="flex justify-between items-start">
-          <span className="font-semibold text-stone-700">Subtotal</span>
+          <span className="font-semibold text-ink">Subtotal</span>
           <div className="text-right">
-            <div className="font-black text-stone-900 text-sm leading-tight">
+            <div className="font-serif font-bold text-ink text-sm leading-tight">
               {formatUsd(subtotalUsd)}
             </div>
-            <div className="font-bold text-stone-400 text-xs mt-0.5">
+            <div className="text-xs text-ink-soft mt-0.5 font-medium">
               {formatKhr(subtotalUsd)}
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between items-center pt-1 border-t border-stone-50">
-          <span>Takeaway Cup & Straw</span>
-          <span className="font-bold text-emerald-700">Free</span>
+        <div className="flex justify-between items-center pt-2 border-t border-line/60">
+          <span>Eco Cup &amp; Straw</span>
+          <span className="font-bold text-matcha">Complimentary</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span>Pickup / Service Fee</span>
+          <span className="font-bold text-matcha">$0.00 (Free)</span>
         </div>
       </div>
 
-      {/* Final Total Box in USD & KHR */}
-      <div className="pt-3 border-t border-stone-200 flex items-baseline justify-between">
+      {/* Final Total Box */}
+      <div className="pt-3 border-t border-line flex items-baseline justify-between bg-cream-deep/50 -mx-5 sm:-mx-6 px-5 sm:px-6 py-4">
         <div>
-          <span className="text-xs font-black text-stone-700 uppercase tracking-wider block">
+          <span className="text-[11px] font-bold text-caramel uppercase tracking-wider block">
             Total Due
           </span>
-          <span className="text-[11px] text-stone-400">
-            Rate: $1 = {formatKhr(1)}
+          <span className="text-[10px] text-ink-soft">
+            Official Rate: $1 = {formatKhr(1)}
           </span>
         </div>
         <div className="text-right">
-          <div className="text-2xl sm:text-3xl font-black text-amber-950 tracking-tight leading-none">
+          <div className="text-2xl sm:text-3xl font-serif font-black text-ink tracking-tight leading-none">
             {formatUsd(totalPriceUsd)}
           </div>
-          <div className="text-sm font-bold text-amber-800 mt-1">
-            {formatKhr(totalPriceUsd)}
+          <div className="text-xs font-bold text-caramel mt-1">
+            {formatKhr(totalPriceKhr)}
           </div>
         </div>
       </div>
 
-      {/* ABA KHQR Callout */}
-      <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/70 flex items-center gap-2.5 text-xs text-amber-950">
-        <div className="w-8 h-8 rounded-xl bg-amber-900 text-white flex items-center justify-center shrink-0 shadow-2xs">
+      {/* ABA Bakong KHQR Callout */}
+      <div className="p-3.5 rounded-2xl bg-cream-deep border border-line flex items-center gap-3 text-xs text-ink">
+        <div className="w-8 h-8 rounded-xl bg-espresso text-caramel flex items-center justify-center shrink-0 shadow-2xs">
           <QrCode className="w-4 h-4" />
         </div>
-        <p className="leading-snug">
-          Pay easily via <strong>Bakong / ABA KHQR</strong> at checkout.
-        </p>
+        <div className="leading-snug">
+          <p className="font-bold text-ink">Instant Bakong KHQR</p>
+          <p className="text-[11px] text-ink-soft">Scan with ABA or any Cambodian mobile banking app.</p>
+        </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="space-y-2.5 pt-1">
+      <div className="space-y-3 pt-1">
         {isAuthenticated ? (
           <Link to="/checkout" className="block w-full">
             <Button
-              variant="primary"
+              variant="accent"
               size="lg"
               className="w-full justify-between shadow-md"
               icon={<ArrowRight className="w-4 h-4" />}
@@ -100,28 +107,30 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
           </Link>
         ) : (
           <div className="space-y-2">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => openAuthModalWith({ mode: 'register', redirectTo: '/checkout' })}
-              className="w-full justify-between shadow-md"
-              icon={<ArrowRight className="w-4 h-4" />}
-            >
-              <span>Continue to checkout</span>
-            </Button>
-            <p className="text-xs text-stone-500 text-center">
+            <Link to="/checkout" className="block w-full">
+              <Button
+                variant="accent"
+                size="lg"
+                className="w-full justify-between shadow-md"
+                icon={<ArrowRight className="w-4 h-4" />}
+              >
+                <span>Checkout as Guest</span>
+              </Button>
+            </Link>
+            <p className="text-xs text-ink-soft text-center pt-1">
               Have an account?{' '}
               <button
                 type="button"
                 onClick={() => openAuthModalWith({ mode: 'login', redirectTo: '/checkout' })}
-                className="font-bold text-stone-950 underline underline-offset-4 cursor-pointer"
+                className="font-bold text-espresso underline underline-offset-4 cursor-pointer hover:text-caramel transition-colors"
               >
-                Sign in
+                Sign in to collect stamps
               </button>
             </p>
           </div>
         )}
 
+        {/* Clear Cart Action */}
         {isConfirmingClear ? (
           <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-center space-y-2 animate-in fade-in">
             <p className="text-xs font-bold text-rose-900">Remove all drinks from cart?</p>
@@ -149,12 +158,17 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
           <button
             type="button"
             onClick={() => setIsConfirmingClear(true)}
-            className="w-full text-xs font-bold text-stone-400 hover:text-rose-600 transition-colors py-2 flex items-center justify-center gap-1.5 cursor-pointer"
+            className="w-full text-xs font-bold text-ink-soft hover:text-rose-600 transition-colors py-1 flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Clear All Drinks</span>
           </button>
         )}
+      </div>
+
+      <div className="pt-2 border-t border-line/60 flex items-center justify-center gap-1.5 text-[11px] text-ink-soft">
+        <ShieldCheck className="w-3.5 h-3.5 text-matcha" />
+        <span>Freshly prepared on demand upon pickup</span>
       </div>
     </div>
   );

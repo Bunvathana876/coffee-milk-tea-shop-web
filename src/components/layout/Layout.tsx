@@ -6,7 +6,7 @@ import { FloatingCartBar } from '../common/FloatingCartBar';
 
 export const Layout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#fbf9f5] text-stone-850 flex flex-col font-sans print:bg-white print:text-black antialiased selection:bg-amber-200 selection:text-amber-950">
+    <div className="min-h-screen bg-cream text-ink flex flex-col font-sans print:bg-white print:text-black antialiased selection:bg-caramel-soft/40 selection:text-espresso-dark">
       <div className="print:hidden">
         <Navbar />
       </div>

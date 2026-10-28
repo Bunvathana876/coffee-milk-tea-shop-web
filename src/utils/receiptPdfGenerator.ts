@@ -69,13 +69,13 @@ export function downloadReceiptPdf(order: Order, paymentStatus = 'PENDING'): voi
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(28, 25, 23); // Dark charcoal
-  doc.text('COFFEE & MILK TEA CAFÉ', centerX, y, { align: 'center' });
+  doc.text('BREW & BOBA CAFÉ', centerX, y, { align: 'center' });
 
   y += 4.5;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
   doc.setTextColor(87, 83, 78);
-  doc.text('Artisan Brews & Handcrafted Milk Teas', centerX, y, { align: 'center' });
+  doc.text('Specialty Coffee & Artisanal Boba Lab', centerX, y, { align: 'center' });
 
   y += 3.5;
   doc.setFontSize(6.5);
@@ -327,13 +327,13 @@ export function downloadReceiptPdf(order: Order, paymentStatus = 'PENDING'): voi
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
   doc.setTextColor(87, 83, 78);
-  doc.text('Thank you for visiting Coffee & Milk Tea Café!', centerX, y, { align: 'center' });
+  doc.text('Thank you for visiting Brew & Boba Café!', centerX, y, { align: 'center' });
 
   y += 3;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(120, 113, 108);
-  doc.text('WiFi: CoffeeMilkTea_Guest  |  Pass: barista2026', centerX, y, { align: 'center' });
+  doc.text('WiFi: BrewAndBoba_Guest  |  Pass: barista2026', centerX, y, { align: 'center' });
 
   y += 2.8;
   doc.text(`Present Order #${order.order_number} to collect your drinks.`, centerX, y, {

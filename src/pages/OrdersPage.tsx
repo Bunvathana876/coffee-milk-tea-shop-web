@@ -88,7 +88,7 @@ export const OrdersPage: React.FC = () => {
       totalAdded += item.quantity;
     }
 
-    setReorderSuccess(`Added ${totalAdded} drink(s) from order ${order.order_number} to your bag!`);
+    setReorderSuccess(`Added ${totalAdded} drink(s) from order ${order.order_number} to your cart!`);
     setTimeout(() => {
       setReorderSuccess(null);
     }, 4000);
@@ -106,31 +106,31 @@ export const OrdersPage: React.FC = () => {
     switch (status.toLowerCase()) {
       case 'completed':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
-            Enjoyed & Completed
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-matcha/15 text-matcha border border-matcha/25">
+            Enjoyed &amp; Completed
           </span>
         );
       case 'preparing':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-caramel/20 text-espresso border border-caramel/40 animate-pulse">
             Barista Brewing
           </span>
         );
       case 'ready':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-sky-100 text-sky-800 border border-sky-300">
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-300">
             Ready for Pickup!
           </span>
         );
       case 'cancelled':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-200">
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
             Cancelled
           </span>
         );
       default:
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-stone-100 text-stone-700 border border-stone-300">
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-cream-deep text-ink-soft border border-line">
             Order Received
           </span>
         );
@@ -138,43 +138,47 @@ export const OrdersPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-4 sm:py-8 space-y-6 sm:space-y-8">
+    <div className="max-w-4xl mx-auto py-4 sm:py-8 space-y-6 sm:space-y-8 animate-in fade-in duration-200">
       {/* Toast */}
       {reorderSuccess && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-md bg-stone-950 text-white px-4 py-3 rounded-2xl shadow-2xl border border-stone-800 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200 ring-1 ring-white/10">
+        <div className="fixed bottom-6 right-6 z-50 max-w-md bg-espresso-dark text-cream px-4 py-3 rounded-2xl shadow-2xl border border-espresso flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200 ring-1 ring-white/10">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <span className="text-xs sm:text-sm font-medium">{reorderSuccess}</span>
           <button
             onClick={() => navigate('/cart')}
-            className="text-amber-300 hover:underline font-bold text-xs ml-2 cursor-pointer"
+            className="text-caramel hover:underline font-bold text-xs ml-2 cursor-pointer"
           >
-            View Bag
+            View Cart
           </button>
         </div>
       )}
 
       {/* Header */}
-      <div className="border-b border-stone-200/80 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="border-b border-line pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-4xl font-serif font-black text-stone-900 tracking-tight">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-caramel uppercase tracking-wider mb-1">
+            <Sparkles className="w-3 h-3" />
+            <span>Café Tracker</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-serif font-black text-ink tracking-tight">
             Live Order Tracking
           </h1>
-          <p className="text-xs sm:text-sm text-stone-500 mt-1">
-            Real-time preparation updates, receipts, and 1-tap reordering
+          <p className="text-xs sm:text-sm text-ink-soft mt-0.5">
+            Real-time brewing updates, digital receipts, and 1-tap reordering
           </p>
         </div>
 
         {isAuthenticated && user && (
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-100/80 border border-amber-300/80 text-amber-950 text-xs font-bold">
-            <Sparkles className="w-4 h-4 text-amber-700" />
-            <span>{user.full_name} • {user.loyalty_stamps} Stamps ⭐️</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-cream-deep border border-line text-ink text-xs font-bold shadow-2xs">
+            <Sparkles className="w-4 h-4 text-caramel" />
+            <span>{user.full_name} • {user.loyalty_stamps} Stamps ☕</span>
           </div>
         )}
       </div>
 
       {/* Phone Lookup Box */}
-      <div className="bg-white p-5 sm:p-6 rounded-3xl border border-stone-200/90 shadow-xs space-y-3">
-        <label className="block text-xs font-black text-stone-700 uppercase tracking-wider">
+      <div className="bg-white p-5 sm:p-6 rounded-3xl border border-line shadow-xs space-y-3">
+        <label className="block text-xs font-bold text-ink uppercase tracking-wider">
           Lookup by Customer Phone Number
         </label>
         <form
@@ -185,7 +189,7 @@ export const OrdersPage: React.FC = () => {
           className="flex gap-2.5"
         >
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-ink-soft absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="tel"
               inputMode="tel"
@@ -193,13 +197,13 @@ export const OrdersPage: React.FC = () => {
               placeholder="e.g. 012 345 678"
               value={phoneInput}
               onChange={(e) => setPhoneInput(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-2xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-900 text-sm font-semibold bg-stone-50/50"
+              className="w-full pl-10 pr-4 py-3 rounded-2xl border border-line focus:outline-none focus:ring-2 focus:ring-caramel text-sm font-semibold bg-cream text-ink placeholder:text-ink-soft/60"
             />
           </div>
           <button
             type="submit"
             disabled={isLoading || !phoneInput.trim()}
-            className="px-6 py-3 rounded-2xl bg-amber-900 hover:bg-amber-950 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer disabled:opacity-50"
+            className="px-6 py-3 rounded-2xl bg-espresso hover:bg-espresso-dark text-cream font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer disabled:opacity-50"
           >
             {isLoading ? 'Searching...' : 'Find Orders'}
           </button>
@@ -209,8 +213,8 @@ export const OrdersPage: React.FC = () => {
       {/* Orders List */}
       <div className="space-y-5">
         {isLoading ? (
-          <div className="text-center py-12 text-stone-400 font-bold text-sm space-y-2">
-            <div className="w-8 h-8 rounded-full border-2 border-amber-900 border-t-transparent animate-spin mx-auto" />
+          <div className="text-center py-12 text-ink-soft font-bold text-sm space-y-2">
+            <div className="w-8 h-8 rounded-full border-2 border-caramel border-t-transparent animate-spin mx-auto" />
             <p>Fetching your orders from the kitchen...</p>
           </div>
         ) : orders.length > 0 ? (
@@ -221,34 +225,34 @@ export const OrdersPage: React.FC = () => {
             return (
               <div
                 key={order.id}
-                className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-7 shadow-xs hover:shadow-md transition-all space-y-5"
+                className="bg-white rounded-3xl border border-line p-5 sm:p-7 shadow-xs hover:border-caramel/40 hover:shadow-sm transition-all space-y-5"
               >
                 {/* Order Top Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 pb-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center font-bold">
-                      <Coffee className="w-6 h-6 text-amber-800" />
+                    <div className="w-11 h-11 rounded-2xl bg-cream-deep text-caramel flex items-center justify-center font-bold border border-line">
+                      <Coffee className="w-6 h-6 text-espresso" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs sm:text-sm font-black text-stone-900">
+                        <span className="font-mono text-xs sm:text-sm font-bold text-ink">
                           {order.order_number}
                         </span>
                         <button
                           type="button"
                           onClick={() => handleCopyOrderNumber(order.order_number)}
-                          className="text-stone-400 hover:text-stone-700 p-1 rounded-md transition-colors"
+                          className="text-ink-soft hover:text-ink p-1 rounded-md transition-colors cursor-pointer"
                           title="Copy order reference"
                         >
                           {copiedOrderNumber === order.order_number ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            <Check className="w-3.5 h-3.5 text-matcha" />
                           ) : (
                             <Copy className="w-3.5 h-3.5" />
                           )}
                         </button>
                       </div>
-                      <span className="text-[11px] text-stone-400 flex items-center gap-1 font-medium mt-0.5">
-                        <Clock className="w-3 h-3" />
+                      <span className="text-[11px] text-ink-soft flex items-center gap-1 font-medium mt-0.5">
+                        <Clock className="w-3 h-3 text-caramel" />
                         {new Date(order.created_at).toLocaleString()}
                       </span>
                     </div>
@@ -261,20 +265,20 @@ export const OrdersPage: React.FC = () => {
 
                 {/* Live Preparation Timeline Stepper */}
                 {!isCancelled && (
-                  <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/70">
+                  <div className="p-4 rounded-2xl bg-cream-deep/60 border border-line">
                     <div className="grid grid-cols-4 gap-2 text-center relative">
                       {/* Step 1 */}
                       <div className="space-y-1">
                         <div
                           className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center text-xs font-black ${
                             step >= 1
-                              ? 'bg-amber-900 text-white ring-2 ring-amber-900/20'
-                              : 'bg-stone-200 text-stone-500'
+                              ? 'bg-espresso text-cream ring-2 ring-espresso/20'
+                              : 'bg-line text-ink-soft'
                           }`}
                         >
                           {step > 1 ? '✓' : '1'}
                         </div>
-                        <span className="text-[10px] font-bold text-stone-700 block">Received</span>
+                        <span className="text-[10px] font-bold text-ink block">Received</span>
                       </div>
 
                       {/* Step 2 */}
@@ -282,13 +286,13 @@ export const OrdersPage: React.FC = () => {
                         <div
                           className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center text-xs font-black ${
                             step >= 2
-                              ? 'bg-amber-900 text-white ring-2 ring-amber-900/20'
-                              : 'bg-stone-200 text-stone-500'
+                              ? 'bg-caramel text-espresso-dark ring-2 ring-caramel/20'
+                              : 'bg-line text-ink-soft'
                           }`}
                         >
                           {step > 2 ? '✓' : '2'}
                         </div>
-                        <span className="text-[10px] font-bold text-stone-700 block">Brewing</span>
+                        <span className="text-[10px] font-bold text-ink block">Brewing</span>
                       </div>
 
                       {/* Step 3 */}
@@ -296,13 +300,13 @@ export const OrdersPage: React.FC = () => {
                         <div
                           className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center text-xs font-black ${
                             step >= 3
-                              ? 'bg-emerald-600 text-white ring-2 ring-emerald-600/20'
-                              : 'bg-stone-200 text-stone-500'
+                              ? 'bg-matcha text-white ring-2 ring-matcha/20'
+                              : 'bg-line text-ink-soft'
                           }`}
                         >
                           {step > 3 ? '✓' : '3'}
                         </div>
-                        <span className="text-[10px] font-bold text-stone-700 block">Ready</span>
+                        <span className="text-[10px] font-bold text-ink block">Ready</span>
                       </div>
 
                       {/* Step 4 */}
@@ -310,32 +314,32 @@ export const OrdersPage: React.FC = () => {
                         <div
                           className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center text-xs font-black ${
                             step >= 4
-                              ? 'bg-emerald-600 text-white'
-                              : 'bg-stone-200 text-stone-500'
+                              ? 'bg-matcha text-white'
+                              : 'bg-line text-ink-soft'
                           }`}
                         >
                           {step >= 4 ? '✓' : '4'}
                         </div>
-                        <span className="text-[10px] font-bold text-stone-700 block">Enjoyed</span>
+                        <span className="text-[10px] font-bold text-ink block">Enjoyed</span>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Items List */}
-                <div className="divide-y divide-stone-100">
+                <div className="divide-y divide-line">
                   {order.items?.map((item, idx) => (
                     <div key={idx} className="py-2.5 first:pt-0 last:pb-0 flex items-start justify-between text-xs gap-4">
                       <div>
-                        <span className="font-serif font-bold text-stone-900">
+                        <span className="font-serif font-bold text-ink">
                           {item.quantity}x {item.product_name}
                         </span>
-                        <span className="text-stone-500 block text-[11px] mt-0.5">
-                          {item.size} • {item.sugar_level} sugar • {item.ice_level}
+                        <span className="text-ink-soft block text-[11px] mt-0.5">
+                          {item.size} • {item.sugar_level} sweet • {item.ice_level}
                           {item.toppings ? ` • +${item.toppings}` : ''}
                         </span>
                       </div>
-                      <span className="font-black text-stone-900">
+                      <span className="font-bold text-ink">
                         {formatUsd(item.subtotal_usd)}
                       </span>
                     </div>
@@ -344,25 +348,25 @@ export const OrdersPage: React.FC = () => {
 
                 {/* Customer Notes (if provided) */}
                 {order.notes && (
-                  <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/60 text-xs text-amber-950">
-                    <span className="font-black block text-[10px] uppercase text-amber-800">
+                  <div className="p-3 rounded-xl bg-cream-deep border border-line text-xs text-ink">
+                    <span className="font-bold block text-[10px] uppercase text-caramel">
                       Barista Notes:
                     </span>
-                    <span>{order.notes}</span>
+                    <span className="text-ink-soft">{order.notes}</span>
                   </div>
                 )}
 
                 {/* Footer Total & 1-Tap Reorder */}
-                <div className="pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3">
+                <div className="pt-3 border-t border-line flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
+                    <span className="text-[10px] font-bold text-ink-soft uppercase tracking-wider block">
                       Total Paid / Due
                     </span>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="font-serif font-black text-lg text-amber-950">
+                      <span className="font-serif font-black text-lg text-ink">
                         {formatUsd(order.total_usd)}
                       </span>
-                      <span className="text-xs font-bold text-stone-400">
+                      <span className="text-xs font-bold text-caramel">
                         ({formatKhr(order.total_usd)})
                       </span>
                     </div>
@@ -372,16 +376,16 @@ export const OrdersPage: React.FC = () => {
                     <Link
                       to={`/receipt/${order.id}`}
                       state={{ order }}
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl border border-stone-200 hover:bg-stone-50 text-stone-700 font-black text-xs transition-colors"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl border border-line hover:bg-cream text-ink font-bold text-xs transition-colors"
                     >
-                      <FileText className="w-3.5 h-3.5 text-stone-500" />
+                      <FileText className="w-3.5 h-3.5 text-caramel" />
                       <span>View Receipt</span>
                     </Link>
 
                     <button
                       type="button"
                       onClick={() => handleReorder(order)}
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-amber-900 hover:bg-amber-950 text-white font-black text-xs shadow-md transition-all cursor-pointer active:scale-95"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-caramel hover:bg-caramel-soft text-espresso-dark font-bold text-xs shadow-xs transition-all cursor-pointer active:scale-95"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>1-Tap Reorder</span>
@@ -392,16 +396,16 @@ export const OrdersPage: React.FC = () => {
             );
           })
         ) : hasSearched ? (
-          <div className="bg-white rounded-3xl border border-stone-200 p-8 text-center space-y-3">
-            <AlertCircle className="w-10 h-10 text-stone-300 mx-auto" />
-            <h3 className="font-serif font-bold text-stone-800 text-base">No orders found for this phone number</h3>
-            <p className="text-xs text-stone-500 max-w-sm mx-auto">
+          <div className="bg-white rounded-3xl border border-line p-8 text-center space-y-3">
+            <AlertCircle className="w-10 h-10 text-ink-soft/40 mx-auto" />
+            <h3 className="font-serif font-bold text-ink text-base">No orders found for this phone number</h3>
+            <p className="text-xs text-ink-soft max-w-sm mx-auto">
               Please double check the phone number or place your first artisan order from our drink menu.
             </p>
             <div className="pt-2">
               <Link
                 to="/menu"
-                className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-2xl bg-amber-900 text-white font-black text-xs shadow-md"
+                className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-2xl bg-caramel text-espresso-dark font-black text-xs shadow-xs hover:bg-caramel-soft transition-colors"
               >
                 <span>Browse Drink Menu</span>
                 <ChevronRight className="w-4 h-4" />
@@ -409,9 +413,9 @@ export const OrdersPage: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-stone-100/60 rounded-3xl border border-dashed border-stone-300 p-10 text-center space-y-2">
-            <Coffee className="w-10 h-10 text-stone-400 mx-auto" />
-            <p className="text-xs font-bold text-stone-600">
+          <div className="bg-cream-deep/60 rounded-3xl border border-dashed border-line p-10 text-center space-y-2">
+            <Coffee className="w-10 h-10 text-caramel mx-auto" />
+            <p className="text-xs font-bold text-ink-soft">
               Enter your phone number above to track your order in real time or view your drink history.
             </p>
           </div>

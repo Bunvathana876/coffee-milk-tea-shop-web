@@ -205,7 +205,7 @@ export const ReceiptPage: React.FC = () => {
                 </span>
               </h1>
               <p className="text-xs text-stone-500">
-                Official digital order receipt for Coffee & Milk Tea Café
+                Official digital order receipt for Brew &amp; Boba Café
               </p>
             </div>
           </div>
@@ -269,7 +269,7 @@ export const ReceiptPage: React.FC = () => {
             orderNumber={order.order_number}
             amountUsd={order.total_usd}
             amountKhr={order.total_khr ?? usdToKhr(order.total_usd)}
-            merchantName="Coffee & Milk Tea Café"
+            merchantName="Brew & Boba Café"
             customerName={order.customer_name}
             paymentStatus={paymentStatus}
             onSimulatePaid={() => setPaymentStatus('paid')}
@@ -291,10 +291,10 @@ export const ReceiptPage: React.FC = () => {
                 <Coffee className="w-5 h-5 text-amber-800" />
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight uppercase">
-                COFFEE & MILK TEA CAFÉ
+                BREW &amp; BOBA CAFÉ
               </h2>
               <p className="text-xs text-stone-500 font-medium">
-                Artisan Brews & Handcrafted Milk Teas
+                Specialty Coffee &amp; Artisanal Boba Lab
               </p>
               <p className="text-[11px] text-stone-400">
                 Street 214, BKK1, Phnom Penh, Cambodia • Tel: +855 23 999 888
@@ -476,7 +476,7 @@ export const ReceiptPage: React.FC = () => {
                   orderNumber={order.order_number}
                   amountUsd={order.total_usd}
                   amountKhr={order.total_khr ?? usdToKhr(order.total_usd)}
-                  merchantName="Coffee & Milk Tea Café"
+                  merchantName="Brew & Boba Café"
                   customerName={order.customer_name}
                   paymentStatus={paymentStatus}
                   compact={true}

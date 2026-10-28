@@ -77,10 +77,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [token]);
 
   useEffect(() => {
-    if (token) {
-      refreshProfile();
-    }
-  }, [token, refreshProfile]);
+    if (!token) return;
+    let cancelled = false;
+    getCustomerProfile(token)
+      .then((profile) => {
+        if (!cancelled) {
+          setUser(profile);
+          localStorage.setItem(USER_KEY, JSON.stringify(profile));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setToken(null);
+          setUser(null);
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(USER_KEY);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   const login = async (identifier: string, password: string) => {
     setIsLoading(true);
