@@ -22,6 +22,7 @@ import { ProductGridSkeleton } from '../components/common/Skeleton';
 import { ErrorState } from '../components/common/ErrorState';
 import { StorySection } from '../components/home/StorySection';
 import { VisitSection } from '../components/home/VisitSection';
+import { MobileAppSection } from '../components/home/MobileAppSection';
 import { useCart } from '../features/cart/useCart';
 import { useAuth } from '../features/auth/AuthContext';
 import type { Product, DrinkCustomization } from '../types';
@@ -70,9 +71,15 @@ export const HomePage: React.FC = () => {
 
   const [customizingProduct, setCustomizingProduct] = useState<Product | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  // Best-selling popular picks (up to 8 drinks)
-  const featured = useMemo(() => products.slice(0, 8), [products]);
+  // Filtered popular picks (up to 8 drinks)
+  const featured = useMemo(() => {
+    if (selectedCategory === 'All') return products.slice(0, 8);
+    return products
+      .filter((p) => p.category_name?.toLowerCase().includes(selectedCategory.toLowerCase()))
+      .slice(0, 8);
+  }, [products, selectedCategory]);
 
   const handleAddToCart = (product: Product, customization: DrinkCustomization) => {
     addItem({
@@ -200,82 +207,17 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Explore Categories with Icons and Imagery */}
-      {categories.length > 0 && (
-        <section aria-labelledby="categories-heading" className="space-y-5">
-          <div className="flex items-end justify-between">
-            <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-espresso text-caramel flex items-center justify-center shrink-0 shadow-sm border border-espresso/20">
-                <Coffee className="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-              <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-caramel uppercase tracking-wider">
-                  <Sparkles className="w-3 h-3" />
-                  <span>Curated Menu</span>
-                </div>
-                <h2
-                  id="categories-heading"
-                  className="text-2xl sm:text-3xl font-serif font-black text-ink tracking-tight"
-                >
-                  Explore by category
-                </h2>
-              </div>
-            </div>
-            <Link
-              to="/menu"
-              className="text-xs sm:text-sm font-bold text-ink-soft hover:text-espresso flex items-center gap-1 group transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-espresso rounded-lg px-2 py-1"
-            >
-              <span>View full menu</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="flex gap-3.5 overflow-x-auto pb-3 scrollbar-none">
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                to={`/menu?category=${encodeURIComponent(cat.name)}`}
-                className="group relative shrink-0 w-40 sm:w-52 h-32 sm:h-36 rounded-3xl overflow-hidden bg-espresso shadow-sm hover:shadow-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-espresso"
-              >
-                {cat.image && (
-                  <img
-                    src={cat.image}
-                    alt=""
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-espresso-dark/95 via-espresso-dark/40 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-3.5 sm:p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-7 h-7 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-caramel-soft">
-                      {getCategoryIcon(cat.name)}
-                    </span>
-                    <span className="text-white font-serif font-bold text-base sm:text-lg tracking-tight">
-                      {cat.name}
-                    </span>
-                  </div>
-                  <span className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white text-xs group-hover:bg-caramel group-hover:text-espresso-dark transition-colors">
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 3. Menu Section: Best-selling Drinks in Attractive, Aligned Cards */}
+      {/* 2. Menu Section: Interactive Category Filter & Popular Drinks */}
       <section aria-labelledby="favorites-heading" className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-caramel">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Guest Favorites</span>
+              <span>Curated Selection</span>
             </div>
             <h2
               id="favorites-heading"
-              className="text-2xl sm:text-3xl font-serif font-bold text-ink tracking-tight mt-0.5"
+              className="text-2xl sm:text-3xl font-serif font-black text-ink tracking-tight mt-0.5"
             >
               Popular drinks today
             </h2>
@@ -292,6 +234,43 @@ export const HomePage: React.FC = () => {
           </Link>
         </div>
 
+        {/* Minimalist Category Filter Pills */}
+        {categories.length > 0 && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <button
+              type="button"
+              onClick={() => setSelectedCategory('All')}
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                selectedCategory === 'All'
+                  ? 'bg-espresso text-cream shadow-xs'
+                  : 'bg-white hover:bg-cream-deep border border-line text-ink-soft hover:text-ink'
+              }`}
+            >
+              All Drinks
+            </button>
+            {categories.map((cat) => {
+              const active = selectedCategory.toLowerCase() === cat.name.toLowerCase();
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(active ? 'All' : cat.name)}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                    active
+                      ? 'bg-espresso text-cream shadow-xs'
+                      : 'bg-white hover:bg-cream-deep border border-line text-ink-soft hover:text-ink'
+                  }`}
+                >
+                  <span className={active ? 'text-caramel-soft' : 'text-caramel'}>
+                    {getCategoryIcon(cat.name)}
+                  </span>
+                  <span>{cat.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {loading ? (
           <ProductGridSkeleton count={4} />
         ) : error ? (
@@ -303,17 +282,6 @@ export const HomePage: React.FC = () => {
             ))}
           </div>
         )}
-
-        {/* Prominent Bottom View Full Menu Action */}
-        <div className="pt-2 text-center">
-          <Link
-            to="/menu"
-            className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-espresso hover:bg-espresso-dark text-cream font-bold text-sm shadow-sm hover:shadow-md transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-espresso focus-visible:ring-offset-2"
-          >
-            <span>Browse Full Menu &amp; Customize</span>
-            <ArrowRight className="w-4 h-4 text-caramel-soft" />
-          </Link>
-        </div>
       </section>
 
       {/* 4. Story & Craft Section: Balanced Image-and-Text with Clear Narrative & CTA */}
@@ -377,7 +345,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. Loyalty Stamp Pass: The Brew Club */}
+      {/* 5. Loyalty Stamp Pass: The Brew Club */}
       <section
         id="rewards"
         aria-labelledby="rewards-heading"
@@ -385,7 +353,7 @@ export const HomePage: React.FC = () => {
       >
         <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-caramel/10 blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8">
           <div className="space-y-3 max-w-lg">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-caramel/20 text-caramel-soft font-bold text-xs">
               <Sparkles className="w-3.5 h-3.5" />
@@ -399,58 +367,38 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Stamp Card Grid */}
-          <div className="bg-espresso-dark/90 rounded-3xl p-5 sm:p-6 border border-white/10 space-y-4 shadow-lg shrink-0">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-caramel-soft">Digital Stamp Pass</span>
-              <span className="text-cream/60">{stamps} / 10 stamps</span>
-            </div>
-
-            <div className="grid grid-cols-5 gap-2 sm:gap-2.5" aria-label={`Loyalty stamp progress: ${stamps} of 10 stamps collected`}>
-              {Array.from({ length: 10 }).map((_, idx) => {
-                const stamped = idx < stamps;
-                const reward = idx === 9;
-                return (
-                  <div
-                    key={idx}
-                    className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center text-xs font-bold border transition-all ${
-                      stamped
-                        ? 'bg-caramel border-caramel text-espresso-dark font-black shadow-xs scale-105'
-                        : reward
-                          ? 'border-dashed border-caramel/60 text-caramel-soft bg-caramel/10 animate-pulse'
-                          : 'border-white/15 bg-white/5 text-white/30'
-                    }`}
-                  >
-                    {stamped ? (
-                      <Coffee className="w-4 h-4 text-espresso-dark" />
-                    ) : reward ? (
-                      <Sparkles className="w-4 h-4 text-caramel" />
-                    ) : (
-                      idx + 1
-                    )}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 shrink-0">
+            {isAuthenticated ? (
+              <div className="bg-espresso-dark/90 rounded-2xl px-6 py-4 border border-white/10 flex items-center gap-4 shadow-md">
+                <div className="w-11 h-11 rounded-xl bg-caramel text-espresso-dark flex items-center justify-center font-black">
+                  <Coffee className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-xs text-cream/70 font-medium">Digital Stamp Pass</div>
+                  <div className="text-sm font-bold text-caramel-soft">
+                    {stamps} / 10 stamps collected
                   </div>
-                );
-              })}
-            </div>
-
-            <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
-              {isAuthenticated ? (
-                <span className="font-bold text-emerald-400">
-                  {stamps === 9 ? 'Next drink unlocks your reward!' : `${10 - stamps} more stamps until free drink`}
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={openAuthModal}
-                  className="font-bold text-caramel hover:text-caramel-soft underline underline-offset-4 cursor-pointer"
-                >
-                  Sign in or create account to collect
-                </button>
-              )}
-            </div>
+                  <div className="text-[11px] text-emerald-400 font-semibold mt-0.5">
+                    {10 - stamps === 1 ? 'Next drink unlocks your reward!' : `${10 - stamps} more until free drink`}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={openAuthModal}
+                className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-caramel hover:bg-caramel-soft text-espresso-dark font-black text-sm shadow-xl transition-all cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-caramel"
+              >
+                <span>Join Brew Club &amp; Collect</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </section>
+
+      {/* 6. Mobile App Showcase & Live Connect */}
+      <MobileAppSection />
 
       {/* 7. Location & Visit Section: Address, Hours, Amenities & Get Directions */}
       <VisitSection />

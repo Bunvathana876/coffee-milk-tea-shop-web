@@ -2,7 +2,6 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
-import { FloatingCartBar } from '../common/FloatingCartBar';
 
 export const Layout: React.FC = () => {
   return (
@@ -14,7 +13,6 @@ export const Layout: React.FC = () => {
         <Outlet />
       </main>
       <div className="print:hidden">
-        <FloatingCartBar />
         <Footer />
       </div>
     </div>

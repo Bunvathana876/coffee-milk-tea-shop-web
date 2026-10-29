@@ -522,11 +522,6 @@ export const ReceiptPage: React.FC = () => {
             >
               Print Receipt
             </Button>
-            <Link to="/orders" className="w-full">
-              <Button variant="secondary" className="w-full py-3">
-                Track Live Status
-              </Button>
-            </Link>
             <Link to="/menu" className="w-full">
               <Button variant="primary" className="w-full py-3">
                 Order More Drinks

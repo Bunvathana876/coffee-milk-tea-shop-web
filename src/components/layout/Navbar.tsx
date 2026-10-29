@@ -4,12 +4,7 @@ import {
   Coffee,
   ShoppingBag,
   User,
-  MapPin,
   Sparkles,
-  Clock,
-  Search,
-  ChevronDown,
-  Phone,
 } from 'lucide-react';
 import { useCart } from '../../features/cart/useCart';
 import { useAuth } from '../../features/auth/AuthContext';
@@ -110,56 +105,9 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* 1. Sleek Top Utility & Store Status Bar */}
-      <div className="bg-espresso-dark text-cream/90 text-xs py-1.5 px-4 border-b border-white/5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 text-[11px] sm:text-xs">
-          {/* Pickup Store with Quick Change Button */}
-          <div className="flex items-center gap-2 truncate">
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Open Now
-            </span>
-
-            <button
-              type="button"
-              onClick={() => setStoreModalOpen(true)}
-              className="inline-flex items-center gap-1.5 text-cream hover:text-caramel-soft font-bold transition-colors cursor-pointer group truncate"
-              title="Change pickup location"
-            >
-              <MapPin className="w-3.5 h-3.5 text-caramel shrink-0" />
-              <span className="truncate">{selectedStore.name}</span>
-              <span className="text-caramel text-[11px] font-semibold underline underline-offset-2 ml-0.5 group-hover:text-caramel-soft">
-                Change
-              </span>
-              <ChevronDown className="w-3 h-3 text-caramel group-hover:translate-y-0.5 transition-transform shrink-0" />
-            </button>
-          </div>
-
-          {/* Quick Hours, Phone & Instant Payment Info */}
-          <div className="flex items-center gap-3 shrink-0 text-cream/80 text-[11px]">
-            <span className="hidden sm:inline-flex items-center gap-1 text-cream/70">
-              <Clock className="w-3.5 h-3.5 text-caramel" />
-              Daily 7:00 AM – 9:00 PM
-            </span>
-            <span className="hidden md:inline text-cream/30">|</span>
-            <span className="hidden md:inline text-caramel-soft font-semibold">
-              🇰🇭 Bakong KHQR Accepted
-            </span>
-            <span className="hidden lg:inline text-cream/30">|</span>
-            <a
-              href="tel:+85523999888"
-              className="hidden lg:flex items-center gap-1 text-cream/70 hover:text-caramel transition-colors"
-            >
-              <Phone className="w-3 h-3 text-caramel" />
-              <span>+855 23 999 888</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Clean Top Brand & Quick Actions Header */}
+      {/* 1. Clean Top Brand Header */}
       <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur-md border-b border-line shadow-2xs">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-18 flex items-center justify-between gap-3 sm:gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-18 flex items-center justify-between gap-4">
           {/* Brandmark Logo */}
           <Link
             to="/"
@@ -179,52 +127,25 @@ export const Navbar: React.FC = () => {
             </div>
           </Link>
 
-          {/* Right Controls: Search, Account, Cart & Order Ahead CTA */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            {/* Search Button: Pill on Desktop/Tablet, Icon on Mobile */}
-            <button
-              type="button"
-              onClick={() => setSearchModalOpen(true)}
-              className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-line hover:border-caramel/40 text-ink-soft hover:text-ink text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
-              aria-label="Search drinks"
-              title="Search menu (⌘K)"
-            >
-              <Search className="w-3.5 h-3.5 text-caramel" />
-              <span className="text-ink-soft">Search drinks...</span>
-              <kbd className="hidden md:inline font-mono text-[9px] bg-cream px-1.5 py-0.5 rounded border border-line text-ink-soft">
-                ⌘K
-              </kbd>
-            </button>
-
-            {/* Mobile Search Icon (< 640px) */}
-            <button
-              type="button"
-              onClick={() => setSearchModalOpen(true)}
-              className="sm:hidden w-9 h-9 rounded-full bg-white border border-line flex items-center justify-center text-ink hover:bg-cream-deep transition-colors cursor-pointer shadow-2xs"
-              aria-label="Search menu"
-            >
-              <Search className="w-4 h-4 text-caramel" />
-            </button>
-
+          {/* Right Controls: Account, Cart & Order Ahead CTA */}
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             {/* User Account / Profile */}
             {isAuthenticated && user ? (
               <div className="flex items-center gap-1.5">
                 {/* Rewards Stamp Pill */}
-                <button
-                  type="button"
-                  onClick={() => setProfileModalOpen(true)}
-                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream-deep border border-line text-xs font-bold text-ink hover:border-caramel/40 transition-colors cursor-pointer"
+                <Link
+                  to="/rewards"
+                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream-deep border border-line text-xs font-bold text-ink hover:border-caramel/40 transition-colors"
                   title="View rewards & stamps"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-caramel" />
                   <span>{stamps}/10 Stamps</span>
-                </button>
+                </Link>
 
                 {/* Profile Avatar Pill */}
-                <button
-                  type="button"
-                  onClick={() => setProfileModalOpen(true)}
-                  className="inline-flex items-center gap-2 pl-1.5 pr-2.5 sm:pr-3 py-1.5 rounded-full bg-white border border-line hover:border-caramel/40 text-xs font-bold text-ink transition-all shadow-2xs cursor-pointer"
+                <Link
+                  to="/profile"
+                  className="inline-flex items-center gap-2 pl-1.5 pr-2.5 sm:pr-3 py-1.5 rounded-full bg-white border border-line hover:border-caramel/40 text-xs font-bold text-ink transition-all shadow-2xs"
                   aria-label="Open profile settings"
                 >
                   <span className="w-6 h-6 rounded-full bg-espresso text-caramel text-xs flex items-center justify-center font-black">
@@ -233,7 +154,7 @@ export const Navbar: React.FC = () => {
                   <span className="hidden sm:inline max-w-[80px] truncate">
                     {user.full_name.split(' ')[0]}
                   </span>
-                </button>
+                </Link>
               </div>
             ) : (
               <button
@@ -282,7 +203,7 @@ export const Navbar: React.FC = () => {
         </div>
       </header>
 
-      {/* 3. Main Floating Bottom Navigation Bar (Visible on All Screen Sizes) */}
+      {/* 2. Floating GooeyNav Bottom Navigation Bar (Active on All Screens) */}
       <BottomNavBar
         stickyBottom
         onOpenProfile={() => setProfileModalOpen(true)}
@@ -325,7 +246,7 @@ export const Navbar: React.FC = () => {
       <ProfileModal
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
-        onOpenOrders={() => navigate('/orders')}
+        onOpenRewards={() => navigate('/rewards')}
       />
     </>
   );

@@ -4,11 +4,13 @@ import {
   MapPin,
   Phone,
   Clock,
-  QrCode,
   Heart,
   Mail,
   ArrowUp,
   Send,
+  ExternalLink,
+  Smartphone,
+  ShieldCheck,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -18,34 +20,14 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-espresso-dark text-cream/80 mt-16 sm:mt-24 pb-24 border-t border-espresso" aria-labelledby="footer-heading">
+    <footer className="bg-espresso-dark text-cream/80 mt-16 sm:mt-24 pb-24 md:pb-12 border-t border-espresso" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">Footer</h2>
-
-      {/* Top Banner Accent Strip */}
-      <div className="bg-espresso py-2.5 px-4 border-b border-white/5 text-xs text-cream/90">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[11px] sm:text-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-bold text-cream">Flagship Café &amp; Pickup Lab</span>
-            <span className="text-cream/40">·</span>
-            <span className="text-cream/70">BKK1, Street 214, Phnom Penh</span>
-          </div>
-          <div className="flex items-center gap-4 text-xs font-medium text-caramel-soft">
-            <span className="flex items-center gap-1.5">
-              <QrCode className="w-3.5 h-3.5 text-caramel" />
-              Bakong KHQR Instant Checkout
-            </span>
-            <span className="hidden sm:inline text-cream/30">·</span>
-            <span className="hidden sm:inline">Zero Artificial Creamers Pledge</span>
-          </div>
-        </div>
-      </div>
 
       {/* Main Footer Columns */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10">
           {/* Column 1: Brand Bio & Values */}
-          <div className="md:col-span-5 space-y-4">
+          <div className="md:col-span-4 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-caramel text-espresso-dark flex items-center justify-center font-bold shadow-sm">
                 <Coffee className="w-5 h-5" />
@@ -101,39 +83,90 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Column 2: Quick Menu Links */}
-          <div className="md:col-span-3 space-y-3">
+          <div className="md:col-span-2 space-y-3">
             <h3 className="text-xs uppercase font-extrabold tracking-wider text-caramel">
-              Explore Menu
+              Explore
             </h3>
             <nav aria-label="Footer Menu" className="flex flex-col space-y-2 text-xs sm:text-sm text-cream/75">
-              <Link to="/menu?category=Coffee" className="hover:text-cream transition-colors">
-                Handcrafted Espresso
+              <Link to="/menu" className="hover:text-cream transition-colors">
+                Full Drink Menu
               </Link>
-              <Link to="/menu?category=Milk%20Tea" className="hover:text-cream transition-colors">
-                Signature Brown Sugar Boba
+              <Link to="/rewards" className="hover:text-cream transition-colors">
+                Club Rewards
               </Link>
-              <Link to="/menu?category=Matcha" className="hover:text-cream transition-colors">
-                Ceremonial Uji Matcha
+              <Link to="/profile" className="hover:text-cream transition-colors">
+                Customer Profile
               </Link>
-              <Link to="/menu" className="hover:text-cream transition-colors font-semibold text-caramel-soft">
-                View Full Menu →
-              </Link>
+              <a href="#visit" className="hover:text-cream transition-colors">
+                Visit Flagship
+              </a>
             </nav>
           </div>
 
-          {/* Column 3: Hours & Flagship Location */}
-          <div className="md:col-span-4 space-y-3">
+          {/* Column 3: Connected Apps & Operations */}
+          <div className="md:col-span-3 space-y-3">
             <h3 className="text-xs uppercase font-extrabold tracking-wider text-caramel">
-              Flagship Café &amp; Hours
+              Connected Apps
             </h3>
-            <div className="space-y-2 text-xs sm:text-sm text-cream/75">
+            <div className="flex flex-col space-y-2.5 text-xs text-cream/80">
+              <a
+                href="http://localhost:5174"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-caramel/40 transition-colors"
+                title="Open Admin Operations Console"
+              >
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-caramel" />
+                  <div>
+                    <div className="font-bold text-cream group-hover:text-caramel transition-colors">
+                      Admin Portal
+                    </div>
+                    <div className="text-[10px] text-cream/60">Live Orders &amp; Kitchen</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-cream/40 group-hover:text-cream" />
+              </a>
+
+              <a
+                href="#mobile-app"
+                className="group flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-caramel/40 transition-colors"
+                title="Brew & Boba Flutter Mobile App"
+              >
+                <div className="flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-caramel" />
+                  <div>
+                    <div className="font-bold text-cream group-hover:text-caramel transition-colors">
+                      Mobile App
+                    </div>
+                    <div className="text-[10px] text-cream/60">iOS &amp; Android App</div>
+                  </div>
+                </div>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-caramel/20 text-caramel-soft font-bold">
+                  Flutter
+                </span>
+              </a>
+
+              <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-bold px-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Backend API Online (:8000)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 4: Hours & Flagship Location */}
+          <div className="md:col-span-3 space-y-3">
+            <h3 className="text-xs uppercase font-extrabold tracking-wider text-caramel">
+              Flagship Café
+            </h3>
+            <div className="space-y-2 text-xs text-cream/75">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-caramel shrink-0 mt-0.5" />
-                <span>#42, Street 214, Sangkat Boeng Keng Kang 1 (BKK1), Phnom Penh</span>
+                <span>#42, St 214, BKK1, Phnom Penh</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-caramel shrink-0" />
-                <span>Daily: 7:00 AM – 9:00 PM (Last call 8:45 PM)</span>
+                <span>Daily 7:00 AM – 9:00 PM</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-caramel shrink-0" />

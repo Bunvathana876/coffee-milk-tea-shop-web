@@ -6,13 +6,13 @@ import { LoyaltyCard } from './LoyaltyCard';
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenOrders: () => void;
+  onOpenRewards?: () => void;
 }
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({
   isOpen,
   onClose,
-  onOpenOrders,
+  onOpenRewards,
 }) => {
   const { user, logout } = useAuth();
 
@@ -85,12 +85,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             <button
               onClick={() => {
                 onClose();
-                onOpenOrders();
+                onOpenRewards?.();
               }}
               className="py-3 px-4 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-black text-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               <Award className="w-4 h-4 text-amber-800" />
-              <span>My Orders & Stamps</span>
+              <span>Rewards & Perks</span>
             </button>
 
             <button
